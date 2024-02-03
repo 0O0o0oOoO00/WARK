@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+***************************************************************************************************
+ Copyright (C) 2023 The Qt Company Ltd.
+ SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+***************************************************************************************************
+-->
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{040DE92B-4146-4A6A-B745-860AF389CCAB}</ProjectGuid>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.22621.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
+    <QtInstall>6.5.1_mingw_64</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="QtBuildTemp.props" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+    <Import Project="VcInstallDir.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="QtBuildTemp.props" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+    <Import Project="VcInstallDir.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\$(TargetName)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(OutDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)src\PS;$(SolutionDir)src\R3S;$(SolutionDir)src\CDC;$(SolutionDir)src\UDC;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\$(TargetName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(OutDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)src\PS;$(SolutionDir)src\R3S;$(SolutionDir)src\CDC;$(SolutionDir)src\UDC;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Label="QtDeploy" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <QtDeploy>true</QtDeploy>
+  </PropertyGroup>
+  <PropertyGroup Label="QtDeploy" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtDeploy>true</QtDeploy>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <ProgramDatabaseFile>$(OutDir)pdb\$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(OutDir)lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+    <QtUic>
+      <QtUicFileName>%(Filename)UI.h</QtUicFileName>
+    </QtUic>
+    <QtMoc>
+      <QtMocFileName>%(Filename)Moc.cpp</QtMocFileName>
+    </QtMoc>
+    <QtRcc>
+      <QtRccFileName>%(Filename)Qrc.cpp</QtRccFileName>
+    </QtRcc>
+    <ClCompile>
+      <PreprocessorDefinitions>RING3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <ProgramDatabaseFile>$(OutDir)pdb\$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(OutDir)lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+    <QtUic>
+      <QtUicFileName>%(Filename)UI.h</QtUicFileName>
+    </QtUic>
+    <QtMoc>
+      <QtMocFileName>%(Filename)Moc.cpp</QtMocFileName>
+    </QtMoc>
+    <QtRcc>
+      <QtRccFileName>%(Filename)Qrc.cpp</QtRccFileName>
+    </QtRcc>
+    <ClCompile>
+      <PreprocessorDefinitions>RING3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="ObjectTypeDetail.cpp" />
+    <ClCompile Include="ProcessDetail.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CDC\CDC.vcxproj">
+      <Project>{20570cb5-990f-4172-a066-c2646edcd4ef}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PS\R3PS.vcxproj">
+      <Project>{68104123-3737-4a76-905d-773485f5a851}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\R3S\R3S.vcxproj">
+      <Project>{6cddda21-53e6-4aa1-83e5-228918d3fe8f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\UDC\UDC.vcxproj">
+      <Project>{7f3ff219-7e76-4dda-a9ec-8d0504ac413b}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="MainWindow.ui" />
+    <QtUic Include="ObjectTypeDetail.ui" />
+    <QtUic Include="ProcessDetail.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="MainWindow.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ProcessDetail.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="QtBuildTemp.props" />
+    <None Include="VcInstallDir.props" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ObjectTypeDetail.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\CD">
+      <UniqueIdentifier>{ce1e8b51-a80b-4042-ac49-84ac8e4cdc2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UD">
+      <UniqueIdentifier>{ddc42df8-49cd-47ec-ba27-b1a79b818019}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PD">
+      <UniqueIdentifier>{ba46c33f-38a7-49df-9743-c5fed79ea92c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PS_ControlCode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_Define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_OutputStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_DriverDefine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_InputStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_CD_ControlCode.h">
+      <Filter>Header Files\CD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_CD_DriverDefine.h">
+      <Filter>Header Files\CD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_CD_OutputStruct.h">
+      <Filter>Header Files\CD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_UD_InputStruct.h">
+      <Filter>Header Files\UD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_UD_ControlCode.h">
+      <Filter>Header Files\UD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_UD_DriverDefine.h">
+      <Filter>Header Files\UD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_PD_ControlCode.h">
+      <Filter>Header Files\PD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_PD_DriverDefine.h">
+      <Filter>Header Files\PD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_PD_OutputStruct.h">
+      <Filter>Header Files\PD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_UD_OutputStruct.h">
+      <Filter>Header Files\UD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_PD_InputStruct.h">
+      <Filter>Header Files\PD</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_CD_InputStruct.h">
+      <Filter>Header Files\CD</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Placeholder.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

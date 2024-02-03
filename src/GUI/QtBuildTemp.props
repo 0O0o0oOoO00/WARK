@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <QtVarsOutputDir>$(SolutionDir)build\$(Configuration)\$(TargetName)\qmake</QtVarsOutputDir>
+    <QtVarsWorkDir>$(QtVarsOutputDir)\temp</QtVarsWorkDir>
+    <QtVarsWorkPath>$(QtVarsWorkDir)\qtvars_$(Platform)_$(Configuration).props</QtVarsWorkPath>
+    <QtVarsIndexPathDesignTime>$(QtVarsWorkDir)\$(ProjectGuid).$(ProjectName).designtime.idx</QtVarsIndexPathDesignTime>
+    <QtVarsFilePath>$(QtVarsOutputDir)\qtvars_$(Platform)_$(Configuration).props</QtVarsFilePath>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="QtVarsOutputDir">
+      <Value>$(QtVarsOutputDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="QtVarsWorkDir">
+      <Value>$(QtVarsWorkDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="QtVarsWorkPath">
+      <Value>$(QtVarsWorkPath)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="QtVarsIndexPathDesignTime">
+      <Value>$(QtVarsIndexPathDesignTime)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="QtVarsFilePath">
+      <Value>$(QtVarsFilePath)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
