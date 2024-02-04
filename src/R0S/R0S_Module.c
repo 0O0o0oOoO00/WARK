@@ -16,5 +16,5 @@ PVOID GetNtoskrnlBase() {
 			return pKldr->DllBase;
 		}
 		pList = pList->Flink;
-	} while (pList == pFirstList);
+	} while (pList != pFirstList);
 }
