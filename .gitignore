@@ -356,3 +356,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Ignore src/R0S/R0S_NtoskrnlOffset.h
+src/R0S/R0S_NtoskrnlOffset.h
