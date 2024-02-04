@@ -4,7 +4,7 @@
 #include "PS_Util.h"
 #include "R0S_Module.h"
 
-NTSTATUS EnumObject(
+NTSTATUS EnumObjectType(
 	_In_ ENUM_OBJECT_CALLBACK Callback,
 	_In_ PVOID Parameter
 ) {

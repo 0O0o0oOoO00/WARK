@@ -59,7 +59,7 @@ IOCTL_FUNC(CollectObjectTypeInfo) {
 		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
 		return;
 	}
-	if (!NT_SUCCESS(EnumObject(g_pNtoskrnlBase, CollectObjectCallback, pR3ObjectInfoVector))) {
+	if (!NT_SUCCESS(EnumObjectType(g_pNtoskrnlBase, CollectObjectCallback, pR3ObjectInfoVector))) {
 		FreeVector(pR3ObjectInfoVector);
 		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
 		return;
@@ -141,7 +141,7 @@ IOCTL_FUNC(CollectObjectTypeDetail) {
 		return;
 	}
 
-	if (!NT_SUCCESS(EnumObject(CollectObjectDetailCallback, &Info))) {
+	if (!NT_SUCCESS(EnumObjectType(CollectObjectDetailCallback, &Info))) {
 		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
 		return;
 	}
