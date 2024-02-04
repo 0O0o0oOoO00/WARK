@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ProcessDetailClass</class>
- <widget class="QWidget" name="ProcessDetailClass">
+ <class>ProcessDetailWndClass</class>
+ <widget class="QWidget" name="ProcessDetailWndClass">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-#include "ObjectTypeDetailUI.h"
+#include "ObjectTypeDetailWndUI.h"
 #include <Windows.h>
 
 static CONST CHAR* OBJECT_TYPE_DETAIL_PROPERTY_NAME_LIST[] = {
@@ -50,7 +50,7 @@ class ObjectTypeDetailWnd : public QWidget {
     Q_OBJECT
 
 private:
-    Ui::ObjectTypeDetailClass m_Ui;
+    Ui::ObjectTypeDetailWndClass m_Ui;
 
     PVOID m_pObjectType;
 

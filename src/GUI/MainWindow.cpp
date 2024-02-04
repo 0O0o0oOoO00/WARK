@@ -1,6 +1,6 @@
 #include "MainWindow.hpp"
 #include "Collector.hpp"
-#include "ProcessDetail.hpp"
+#include "ProcessDetailWnd.hpp"
 #include "Utiler.hpp"
 #include "ObjectTypeDetailWnd.hpp"
 
@@ -100,7 +100,7 @@ void MainWindow::ShowProcessDetailInfo(bool checked) {
     if (!pEprocess) {
         return;
     }
-    ProcessDetail* pDetail = new ProcessDetail(pEprocess);
+    ProcessDetailWnd* pDetail = new ProcessDetailWnd(pEprocess);
     pDetail->show();
 }
 

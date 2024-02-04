@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-#include "ProcessDetailUI.h"
+#include "ProcessDetailWndUI.h"
 #include <Windows.h>
 
 #define EPROCESS_DETAIL_PROPERTY_INDEX 0
@@ -54,17 +54,17 @@
 #define PEB_DETAIL_PROPERTY_MAXIMUM_NUMBER_OF_HEAPS_NAME "MaximumNumberOfHeaps"
 #define PEB_DETAIL_PROPERTY_SESSION_ID_NAME "SessionId"
 
-class ProcessDetail : public QWidget {
+class ProcessDetailWnd : public QWidget {
     Q_OBJECT
 
 private:
-    Ui::ProcessDetailClass m_Ui;
+    Ui::ProcessDetailWndClass m_Ui;
 
     PVOID m_pEprocess;
 
 public:
-    ProcessDetail(PVOID pEprocess, QWidget* parent = nullptr);
-    ~ProcessDetail();
+    ProcessDetailWnd(PVOID pEprocess, QWidget* parent = nullptr);
+    ~ProcessDetailWnd();
 
 private:
     void RefershProcessDetail(bool checked = false);

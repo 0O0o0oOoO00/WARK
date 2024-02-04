@@ -1,10 +1,10 @@
-#include "ProcessDetail.hpp"
+#include "ProcessDetailWnd.hpp"
 #include "Collector.hpp"
 #include <QDateTime>
 
 extern CollectorDriver* g_pCollectorDriver;
 
-ProcessDetail::ProcessDetail(PVOID pEprocess, QWidget* parent)
+ProcessDetailWnd::ProcessDetailWnd(PVOID pEprocess, QWidget* parent)
     : QWidget(parent)
     , m_pEprocess(NULL)
 {
@@ -19,7 +19,7 @@ ProcessDetail::ProcessDetail(PVOID pEprocess, QWidget* parent)
     m_Ui.PcbDetailTable->setRowCount(PCB_DETAIL_PROPERTY_COUNT);
     m_Ui.PebDetailTable->setRowCount(PEB_DETAIL_PROPERTY_COUNT);
 
-    connect(m_Ui.ProcessDetailRefreshButton, &QPushButton::clicked, this, &ProcessDetail::RefershProcessDetail);
+    connect(m_Ui.ProcessDetailRefreshButton, &QPushButton::clicked, this, &ProcessDetailWnd::RefershProcessDetail);
 
     ULONG i = 0;
     m_Ui.EprocessDetailTable->setItem(i++, EPROCESS_DETAIL_PROPERTY_INDEX, new QTableWidgetItem(QString(EPROCESS_DETAIL_PROPERTY_PEPROCESS_NAME)));
@@ -70,11 +70,11 @@ ProcessDetail::ProcessDetail(PVOID pEprocess, QWidget* parent)
 
 }
 
-ProcessDetail::~ProcessDetail() {
+ProcessDetailWnd::~ProcessDetailWnd() {
 
 }
 
-void ProcessDetail::RefershProcessDetail(bool checked) {
+void ProcessDetailWnd::RefershProcessDetail(bool checked) {
 
     if (!m_pEprocess) {
         return;

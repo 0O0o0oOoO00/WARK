@@ -32,7 +32,7 @@
     <ClCompile Include="MainWindow.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="ProcessDetail.cpp">
+    <ClCompile Include="ProcessDetailWnd.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="ObjectTypeDetailWnd.cpp">
@@ -43,10 +43,10 @@
     <QtUic Include="MainWindow.ui">
       <Filter>Forms</Filter>
     </QtUic>
-    <QtUic Include="ProcessDetail.ui">
+    <QtUic Include="ProcessDetailWnd.ui">
       <Filter>Forms</Filter>
     </QtUic>
-    <QtUic Include="ObjectTypeDetail.ui">
+    <QtUic Include="ObjectTypeDetailWnd.ui">
       <Filter>Forms</Filter>
     </QtUic>
   </ItemGroup>
@@ -54,7 +54,7 @@
     <QtMoc Include="MainWindow.hpp">
       <Filter>Headers</Filter>
     </QtMoc>
-    <QtMoc Include="ProcessDetail.hpp">
+    <QtMoc Include="ProcessDetailWnd.hpp">
       <Filter>Headers</Filter>
     </QtMoc>
     <QtMoc Include="ObjectTypeDetailWnd.hpp">

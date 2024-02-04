@@ -149,7 +149,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="ObjectTypeDetailWnd.cpp" />
-    <ClCompile Include="ProcessDetail.cpp" />
+    <ClCompile Include="ProcessDetailWnd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDC\CDC.vcxproj">
@@ -167,14 +167,14 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MainWindow.ui" />
-    <QtUic Include="ObjectTypeDetail.ui" />
-    <QtUic Include="ProcessDetail.ui" />
+    <QtUic Include="ObjectTypeDetailWnd.ui" />
+    <QtUic Include="ProcessDetailWnd.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainWindow.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="ProcessDetail.hpp" />
+    <QtMoc Include="ProcessDetailWnd.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="QtBuildTemp.props" />
