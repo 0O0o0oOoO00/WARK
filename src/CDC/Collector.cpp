@@ -117,7 +117,7 @@ ObjectTypeDetail CollectorDriver::CollectObjectTypeDetail(PVOID pObjectType) {
 		goto Error;
 	}
 
-	if (!DeviceIoControl(m_hDriver, CD_IOCTL_COLLECT_PROCESS_DETAIL, &pObjectType, sizeof(PVOID), &pDetail, sizeof(POBJECT_TYPE_DETAIL), NULL, NULL)) {
+	if (!DeviceIoControl(m_hDriver, CD_IOCTL_COLLECT_OBJECT_TYPE_DETAIL, &pObjectType, sizeof(PVOID), &pDetail, sizeof(POBJECT_TYPE_DETAIL), NULL, NULL)) {
 		goto Error;
 	}
 	if (!pDetail) {

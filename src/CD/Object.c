@@ -97,6 +97,7 @@ ENUM_STATUS CollectObjectDetailCallback(
 	OBJECT_TYPE_DETAIL Detail = { 0 };
 	NOK_INCOMPLETE_OBJECT_TYPE_INITIALIZER TypeInfo = pObjectType->TypeInfo;
 
+	Detail.pObjectType = pObjectType;
 	Detail.usObjectTypeFlags = TypeInfo.ObjectTypeFlags;
 	Detail.ulObjectTypeCode = TypeInfo.ObjectTypeCode;
 	Detail.ulInvalidAttributes = TypeInfo.InvalidAttributes;
@@ -135,7 +136,7 @@ IOCTL_FUNC(CollectObjectTypeDetail) {
 	}
 
 	COLLECT_OBJECT_TYPE_DETAIL_INFO Info = { 0 };
-	if (!NT_SUCCESS(ReadEntireIoPackage(&IoPackage, &(Info.pObjectType), sizeof(POBJECT_TYPE)))) {
+	if (!NT_SUCCESS(ReadEntireIoPackage(&IoPackage, &(Info.pObjectType), NULL))) {
 		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
 		return;
 	}

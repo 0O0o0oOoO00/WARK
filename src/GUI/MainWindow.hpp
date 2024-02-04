@@ -51,4 +51,5 @@ private:
     void TerminateProcess(bool checked);
     void OpenProcessFolder(bool checked);
     void ShowObjectTypeDetailInfo(bool checked);
+    void ShowObjectTypeInfoTableMenu(const QPoint& pos);
 };

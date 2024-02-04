@@ -31,6 +31,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(OpenProcessFolderAction, &QAction::triggered, this, &MainWindow::OpenProcessFolder);
 
     connect(m_Ui.ProcessInfoTable, &QTableWidget::customContextMenuRequested, this, &MainWindow::ShowProcessInfoTableMenu);
+    connect(m_Ui.ObjectTypeInfoTable, &QTableWidget::customContextMenuRequested, this, &MainWindow::ShowObjectTypeInfoTableMenu);
+
+    connect(ShowObjectTypeDetailAction, &QAction::triggered, this, &MainWindow::ShowObjectTypeDetailInfo);
 
     connect(m_Ui.ProcessInfoRefreshButton, &QPushButton::clicked, this, &MainWindow::RefreshProcessInfo);
     connect(m_Ui.ObjectTypeInfoRefreshButton, &QPushButton::clicked, this, &MainWindow::RefreshObjectTypeInfo);
@@ -44,6 +47,10 @@ MainWindow::~MainWindow() {
 
 void MainWindow::ShowProcessInfoTableMenu(const QPoint& pos) {
     ProcessInfoTableMenu->exec(QCursor::pos());
+}
+
+void MainWindow::ShowObjectTypeInfoTableMenu(const QPoint& pos) {
+    ObjectTypeInfoTableMenu->exec(QCursor::pos());
 }
 
 void MainWindow::RefreshProcessInfo(bool checked) {
@@ -125,7 +132,7 @@ void MainWindow::OpenProcessFolder(bool checked) {
 void MainWindow::ShowObjectTypeDetailInfo(bool checked) {
     QList<QTableWidgetItem*>  pSelectedItemList = m_Ui.ObjectTypeInfoTable->selectedItems();
 
-    QTableWidgetItem* pObjectTypeItem = pSelectedItemList[PROCESS_INFO_PEPROCESS_INDEX];
+    QTableWidgetItem* pObjectTypeItem = pSelectedItemList[OBJECT_TYPE_INFO_POBJECTTYPE_INDEX];
     if (!pObjectTypeItem) {
         return;
     }
