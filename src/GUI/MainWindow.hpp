@@ -24,6 +24,8 @@
 #define TERMINATE_PROCESS_ACTION_NAME "Terminate"
 #define OPEN_PROCESS_FOLDER_ACTION_NAME "OpenFolder"
 
+#define SHOW_OBJECT_TYPE_DETAIL_ACTION_NAME "Detail"
+
 class MainWindow : public QWidget {
     Q_OBJECT
 
@@ -33,6 +35,9 @@ private:
     QAction* ShowProcessDetailAction;
     QAction* TerminateProcessAction;
     QAction* OpenProcessFolderAction;
+
+    QMenu* ObjectTypeInfoTableMenu;
+    QAction* ShowObjectTypeDetailAction;
 
 public:
     MainWindow(QWidget* parent = nullptr);
@@ -45,4 +50,5 @@ private:
     void ShowProcessDetailInfo(bool checked);
     void TerminateProcess(bool checked);
     void OpenProcessFolder(bool checked);
+    void ShowObjectTypeDetailInfo(bool checked);
 };

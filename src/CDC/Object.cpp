@@ -28,6 +28,7 @@ ObjectTypeDetail::ObjectTypeDetail(
 		return;
 	}
 
+	m_pObjectType = pObjectTypeDetail->pObjectType;
 	m_usObjectTypeFlags = pObjectTypeDetail->usObjectTypeFlags;
 	m_ulObjectTypeCode = pObjectTypeDetail->ulObjectTypeCode;
 	m_ulInvalidAttributes = pObjectTypeDetail->ulInvalidAttributes;

@@ -35,7 +35,7 @@
     <ClCompile Include="ProcessDetail.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectTypeDetail.cpp">
+    <ClCompile Include="ObjectTypeDetailWnd.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,7 +57,7 @@
     <QtMoc Include="ProcessDetail.hpp">
       <Filter>Headers</Filter>
     </QtMoc>
-    <QtMoc Include="ObjectTypeDetail.hpp">
+    <QtMoc Include="ObjectTypeDetailWnd.hpp">
       <Filter>Headers</Filter>
     </QtMoc>
   </ItemGroup>

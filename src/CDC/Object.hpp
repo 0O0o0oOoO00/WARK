@@ -22,6 +22,7 @@ public:
 
 class DLL_EXPORT ObjectTypeDetail {
 public:
+	PVOID m_pObjectType;
 	USHORT m_usObjectTypeFlags;
 	ULONG m_ulObjectTypeCode;
 	ULONG m_ulInvalidAttributes;

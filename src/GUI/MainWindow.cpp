@@ -2,6 +2,7 @@
 #include "Collector.hpp"
 #include "ProcessDetail.hpp"
 #include "Utiler.hpp"
+#include "ObjectTypeDetailWnd.hpp"
 
 extern CollectorDriver* g_pCollectorDriver;
 extern UtilerDriver* g_pUtilerDriver;
@@ -19,6 +20,11 @@ MainWindow::MainWindow(QWidget* parent)
     ProcessInfoTableMenu->addAction(ShowProcessDetailAction);
     ProcessInfoTableMenu->addAction(TerminateProcessAction);
     ProcessInfoTableMenu->addAction(OpenProcessFolderAction);
+
+    ObjectTypeInfoTableMenu = new QMenu(m_Ui.ObjectTypeInfoTable);
+    ShowObjectTypeDetailAction = new QAction(SHOW_OBJECT_TYPE_DETAIL_ACTION_NAME, m_Ui.ObjectTypeInfoTable);
+
+    ObjectTypeInfoTableMenu->addAction(ShowObjectTypeDetailAction);
     
     connect(ShowProcessDetailAction, &QAction::triggered, this, &MainWindow::ShowProcessDetailInfo);
     connect(TerminateProcessAction, &QAction::triggered, this, &MainWindow::TerminateProcess);
@@ -114,4 +120,19 @@ void MainWindow::OpenProcessFolder(bool checked) {
     }
     QString FullProcessFile = pProcessFileItem->text();
     ShellExecute(NULL, TEXT("open"), TEXT("explorer.exe"), ("/select," + FullProcessFile).toStdWString().c_str(), NULL, SW_SHOWNORMAL);
+}
+
+void MainWindow::ShowObjectTypeDetailInfo(bool checked) {
+    QList<QTableWidgetItem*>  pSelectedItemList = m_Ui.ObjectTypeInfoTable->selectedItems();
+
+    QTableWidgetItem* pObjectTypeItem = pSelectedItemList[PROCESS_INFO_PEPROCESS_INDEX];
+    if (!pObjectTypeItem) {
+        return;
+    }
+    PVOID pObjectType = (PVOID)(pObjectTypeItem->text().toULongLong(NULL, 16));
+    if (!pObjectType) {
+        return;
+    }
+    ObjectTypeDetailWnd* pDetail = new ObjectTypeDetailWnd(pObjectType);
+    pDetail->show();
 }

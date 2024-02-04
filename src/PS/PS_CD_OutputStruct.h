@@ -88,6 +88,7 @@ typedef struct _PROCESS_DETAIL {
 }PROCESS_DETAIL, * PPROCESS_DETAIL;
 
 typedef struct _OBJECT_TYPE_DETAIL {
+	PVOID pObjectType;
 	USHORT usObjectTypeFlags;
 	ULONG ulObjectTypeCode;
 	ULONG ulInvalidAttributes;
