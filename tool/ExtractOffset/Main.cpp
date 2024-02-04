@@ -158,6 +158,9 @@ VOID OutputToFile(
 
     FSTREAM OutputFile(pOutputFile, FOUT);
     ULONG ulCount = 0;
+
+    OutputFile << "#pragma once" << "\n\n";
+
     for (Symbol& i: SymbolVector) {
         if (i.m_szSymbolName.find('@') != -1 ||
             i.m_szSymbolName.find('?') != -1 ||
