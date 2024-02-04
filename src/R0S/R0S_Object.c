@@ -2,13 +2,14 @@
 #include "R0S_Undocumented.h"
 #include "R0S_NtoskrnlOffset.h"
 #include "PS_Util.h"
-
+#include "R0S_Module.h"
 
 NTSTATUS EnumObject(
-	_In_ PVOID pNtoskrnlBase,
 	_In_ ENUM_OBJECT_CALLBACK Callback,
 	_In_ PVOID Parameter
 ) {
+	PVOID pNtoskrnlBase = GetNtoskrnlBase();
+
 	if (!pNtoskrnlBase || !Callback) {
 		return STATUS_UNSUCCESSFUL;
 	}

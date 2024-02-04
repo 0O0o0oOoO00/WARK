@@ -141,7 +141,7 @@ IOCTL_FUNC(CollectObjectTypeDetail) {
 		return;
 	}
 
-	if (!NT_SUCCESS(EnumObject(g_pNtoskrnlBase, CollectObjectDetailCallback, &Info))) {
+	if (!NT_SUCCESS(EnumObject(CollectObjectDetailCallback, &Info))) {
 		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
 		return;
 	}

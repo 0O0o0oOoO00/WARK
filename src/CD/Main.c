@@ -1,7 +1,7 @@
 #include <ntifs.h>
 #include "Dispatch.h"
 #include "PS_CD_DriverDefine.h"
-#include "R0S_Driver.h"
+#include "R0S_Module.h"
 
 PDRIVER_OBJECT g_pDriverObject = NULL;
 PDEVICE_OBJECT g_pDeviceObject = NULL;
@@ -28,7 +28,7 @@ NTSTATUS DriverEntry(
 	}
 	pDriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = DispatchDeviceControl;
 
-	g_pNtoskrnlBase = GetNtoskrnlBase(pDriverObject);
+	g_pNtoskrnlBase = GetNtoskrnlBase();
 
 	UNICODE_STRING szDeviceName;
 	RtlInitUnicodeString(&szDeviceName, CD_DEVICE_NAME);

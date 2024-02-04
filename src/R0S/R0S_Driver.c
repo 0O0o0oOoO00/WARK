@@ -1,10 +1,5 @@
 #include "R0S_Driver.h"
 
-typedef struct _NTOSKRNL_INFO {
-	PVOID pNtoskrnlBase;
-	UNICODE_STRING szNtoskrnlName;
-}NTOSKRNL_INFO, * PNTOSKRNL_INFO;
-
 NTSTATUS EnumDriverLdr(
 	_In_ PDRIVER_OBJECT pDriverObject,
 	_In_ ENUM_DRIVER_LDR_CALLBACK Callback,
@@ -33,25 +28,4 @@ NTSTATUS EnumDriverLdr(
 	} while (pListEntry != pFirstList);
 SuccessReturn:
 	return STATUS_SUCCESS;
-}
-
-ENUM_STATUS GetNtoskrnlBaseCallback(
-	_In_ PNOK_INCOMPLETE_LDR_DATA_TABLE_ENTRY pLdr, 
-	_In_opt_ PVOID Parameter
-) {
-	PNTOSKRNL_INFO pNtoskrnlInfo = (PNOK_INCOMPLETE_LDR_DATA_TABLE_ENTRY)Parameter;
-	if (RtlCompareUnicodeString(&(pNtoskrnlInfo->szNtoskrnlName), &(pLdr->BaseDllName), TRUE) == 0) {
-		pNtoskrnlInfo->pNtoskrnlBase = pLdr->DllBase;
-		return ENUM_BREAK;
-	}
-	return ENUM_CONTINUE;
-}
-
-PVOID GetNtoskrnlBase(
-	_In_ PDRIVER_OBJECT pDriverObject
-) {
-	NTOSKRNL_INFO NtoskrnlInfo = { 0 };
-	RtlInitUnicodeString(&(NtoskrnlInfo.szNtoskrnlName), NTOSKRNL_NAME);
-	EnumDriverLdr(pDriverObject, GetNtoskrnlBaseCallback, &NtoskrnlInfo);
-	return NtoskrnlInfo.pNtoskrnlBase;
 }

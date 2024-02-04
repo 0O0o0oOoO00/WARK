@@ -43,3 +43,4 @@ NTSTATUS NTAPI MmCopyVirtualMemory(
 extern POBJECT_TYPE* IoDriverObjectType;
 extern POBJECT_TYPE* PsProcessType;
 // extern POBJECT_TYPE* ObTypeIndexTable;
+extern LIST_ENTRY PsLoadedModuleList;

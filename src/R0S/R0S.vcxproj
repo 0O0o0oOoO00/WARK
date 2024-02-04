@@ -39,6 +39,7 @@
     <ClCompile Include="R0S_Driver.c" />
     <ClCompile Include="R0S_Io.c" />
     <ClCompile Include="R0S_Ioctl.c" />
+    <ClCompile Include="R0S_Module.c" />
     <ClCompile Include="R0S_Object.c" />
     <ClCompile Include="R0S_Process.c" />
     <ClCompile Include="R0S_Utils.c" />
@@ -51,6 +52,7 @@
     <ClInclude Include="R0S_Driver.h" />
     <ClInclude Include="R0S_Io.h" />
     <ClInclude Include="R0S_Ioctl.h" />
+    <ClInclude Include="R0S_Module.h" />
     <ClInclude Include="R0S_NtoskrnlOffset.h" />
     <ClInclude Include="R0S_NtoskrnlStruct.h" />
     <ClInclude Include="R0S_Object.h" />

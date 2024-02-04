@@ -135,3 +135,46 @@ typedef struct _NOK_INCOMPLETE_OBJECT_TYPE {
     ULONG Key;                                                              //0xc0
     LIST_ENTRY CallbackList;                                                //0xc8
 }NOK_INCOMPLETE_OBJECT_TYPE, * PNOK_INCOMPLETE_OBJECT_TYPE;
+
+//0x20 bytes (sizeof)
+typedef struct _NON_PAGED_DEBUG_INFO {
+    USHORT Signature;                                                       //0x0
+    USHORT Flags;                                                           //0x2
+    ULONG Size;                                                             //0x4
+    USHORT Machine;                                                         //0x8
+    USHORT Characteristics;                                                 //0xa
+    ULONG TimeDateStamp;                                                    //0xc
+    ULONG CheckSum;                                                         //0x10
+    ULONG SizeOfImage;                                                      //0x14
+    ULONGLONG ImageBase;                                                    //0x18
+}NON_PAGED_DEBUG_INFO, * PNON_PAGED_DEBUG_INFO;
+
+//0xa0 bytes (sizeof)
+typedef struct _KLDR_DATA_TABLE_ENTRY {
+    LIST_ENTRY InLoadOrderLinks;                                            //0x0
+    PVOID ExceptionTable;                                                   //0x10
+    ULONG ExceptionTableSize;                                               //0x18
+    PVOID GpValue;                                                          //0x20
+    NON_PAGED_DEBUG_INFO* NonPagedDebugInfo;                                //0x28
+    PVOID DllBase;                                                          //0x30
+    PVOID EntryPoint;                                                       //0x38
+    ULONG SizeOfImage;                                                      //0x40
+    UNICODE_STRING FullDllName;                                             //0x48
+    UNICODE_STRING BaseDllName;                                             //0x58
+    ULONG Flags;                                                            //0x68
+    USHORT LoadCount;                                                       //0x6c
+    union {
+        USHORT SignatureLevel : 4;                                          //0x6e
+        USHORT SignatureType : 3;                                           //0x6e
+        USHORT Unused : 9;                                                  //0x6e
+        USHORT EntireField;                                                 //0x6e
+    } u1;                                                                   //0x6e
+    PVOID SectionPointer;                                                   //0x70
+    ULONG CheckSum;                                                         //0x78
+    ULONG CoverageSectionSize;                                              //0x7c
+    PVOID CoverageSection;                                                  //0x80
+    PVOID LoadedImports;                                                    //0x88
+    PVOID Spare;                                                            //0x90
+    ULONG SizeOfImageNotRounded;                                            //0x98
+    ULONG TimeDateStamp;                                                    //0x9c
+}KLDR_DATA_TABLE_ENTRY, * PKLDR_DATA_TABLE_ENTRY;
