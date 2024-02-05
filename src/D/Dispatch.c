@@ -6,6 +6,16 @@
 
 PDEVICE_OBJECT g_pDeviceObject;
 
+static CONST IOCTL_FUNCTION IOCTL_FUNC_LIST[] = {
+	IoctlSetTargetProcess,
+	IoctlCollectProcessInfo,
+	IoctlCollectObjectTypeInfo,
+	IoctlCollectProcessDetail,
+	IoctlCollectObjectTypeDetail
+};
+
+#define IOCTL_FUNC_COUNT (sizeof(IOCTL_FUNC_LIST) / sizeof(IOCTL_FUNCTION))
+
 NTSTATUS DispatchDefault(
 	PDEVICE_OBJECT pDeviceObject,
 	PIRP pIrp
@@ -30,26 +40,16 @@ NTSTATUS DispatchDeviceControl(
 	}
 	IRP_DATA IrpData;
 	InitializeIrpData(pIrp, &IrpData);
-	switch (IrpData.pIoStack->Parameters.DeviceIoControl.IoControlCode) {
-	case IOCTL_SET_TARGET_PROCESS:
-		IoctlSetTargetProcess(&IrpData);
-		break;
-	case IOCTL_COLLECT_PROCESS_INFO:
-		IoctlCollectProcessInfo(&IrpData);
-		break;
-	case IOCTL_COLLECT_OBJECT_TYPE_INFO:
-		IoctlCollectObjectTypeInfo(&IrpData);
-		break;
-	case IOCTL_COLLECT_PROCESS_DETAIL:
-		IoctlCollectProcessDetail(&IrpData);
-		break;
-	case IOCTL_COLLECT_OBJECT_TYPE_DETAIL:
-		IoctlCollectObjectTypeDetail(&IrpData);
-		break;
-	default:
+	IOCTL_CODE ControlCode = { 0 };
+	ControlCode.Code = IrpData.pIoStack->Parameters.DeviceIoControl.IoControlCode;
+	ULONG ulIoctlFuncIndex = ControlCode.Function - IOCTL_FUNCTION_CODE_RESERVED;
+	if (ulIoctlFuncIndex >= IOCTL_FUNC_COUNT) {
+		Status = STATUS_UNSUCCESSFUL;
+		Information = 0;
 		goto FinishIrp;
-		break;
 	}
+
+	IOCTL_FUNC_LIST[ulIoctlFuncIndex](&IrpData);
 
 	Status = IrpData.Status;
 	Information = IrpData.Information;

@@ -1,6 +1,18 @@
 #pragma once
 #include <ntifs.h>
 
+typedef union _IOCTL_CODE {
+	ULONG Code;
+	struct {
+		ULONG Method : 2;
+		ULONG Function : 12;
+		ULONG Access : 2;
+		ULONG DeviceType : 16;
+	};
+}IOCTL_CODE, * PIOCTL_CODE;
+
+#define IOCTL_FUNCTION_CODE_RESERVED 0x800
+
 typedef struct _IO_PACKAGE {
 	ULONG IoMethod;
 	ULONG ulInputBufferOperatedLength;
@@ -61,6 +73,8 @@ NTSTATUS ReadEntireIoPackage(
 	VOID Ioctl##name( \
 		_Inout_ PIRP_DATA pIrpData \
 	)
+
+typedef VOID (*IOCTL_FUNCTION)(_Inout_ PIRP_DATA pIrpData);
 
 NTSTATUS InitializeIrpData(
 	_In_ PIRP pIrp,
