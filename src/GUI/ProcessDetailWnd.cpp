@@ -1,8 +1,8 @@
 #include "ProcessDetailWnd.hpp"
-#include "Collector.hpp"
+#include "DC.hpp"
 #include <QDateTime>
 
-extern CollectorDriver* g_pCollectorDriver;
+extern Driver* g_pDriver;
 
 ProcessDetailWnd::ProcessDetailWnd(PVOID pEprocess, QWidget* parent)
     : QWidget(parent)
@@ -48,7 +48,7 @@ void ProcessDetailWnd::RefershProcessDetail(bool checked) {
         return;
     }
 
-    ProcessDetailInfo Info = g_pCollectorDriver->CollectProcessDetailInfo(m_pEprocess);
+    ProcessDetailInfo Info = g_pDriver->CollectProcessDetailInfo(m_pEprocess);
 
     ULONG i = 0;
     ProcessDetailEprocess EprocessInfo = Info.m_Eprocess;

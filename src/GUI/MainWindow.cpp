@@ -1,11 +1,9 @@
 #include "MainWindow.hpp"
-#include "Collector.hpp"
+#include "DC.hpp"
 #include "ProcessDetailWnd.hpp"
-#include "Utiler.hpp"
 #include "ObjectTypeDetailWnd.hpp"
 
-extern CollectorDriver* g_pCollectorDriver;
-extern UtilerDriver* g_pUtilerDriver;
+extern Driver* g_pDriver;
 
 MainWindow::MainWindow(QWidget* parent)
     : QWidget(parent) 
@@ -56,7 +54,7 @@ void MainWindow::ShowObjectTypeInfoTableMenu(const QPoint& pos) {
 void MainWindow::RefreshProcessInfo(bool checked) {
     m_Ui.ProcessInfoTable->clearContents();
 
-    Vector<ProcessInfo> ProcessInfoVector = g_pCollectorDriver->CollectProcessInfo();
+    Vector<ProcessInfo> ProcessInfoVector = g_pDriver->CollectProcessInfo();
     ULONG Count = ProcessInfoVector.size();
     m_Ui.ProcessInfoTable->setRowCount(Count);
     for (ULONG i = 0; i < Count; i++) {
@@ -74,7 +72,7 @@ void MainWindow::RefreshProcessInfo(bool checked) {
 void MainWindow::RefreshObjectTypeInfo(bool checked) {
     m_Ui.ObjectTypeInfoTable->clearContents();
 
-    Vector<ObjectTypeInfo> ObjectTypeInfoVector = g_pCollectorDriver->CollectObjectTypeInfo();
+    Vector<ObjectTypeInfo> ObjectTypeInfoVector = g_pDriver->CollectObjectTypeInfo();
     ULONG Count = ObjectTypeInfoVector.size();
     m_Ui.ObjectTypeInfoTable->setRowCount(Count);
     for (ULONG i = 0; i < Count; i++) {
@@ -115,7 +113,7 @@ void MainWindow::TerminateProcess(bool checked) {
     if (!pEprocess) {
         return;
     }
-    g_pUtilerDriver->TerminateProcess(pEprocess);
+    g_pDriver->TerminateProcess(pEprocess);
 }
 
 void MainWindow::OpenProcessFolder(bool checked) {

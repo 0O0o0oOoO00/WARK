@@ -51,7 +51,9 @@
     <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
   </Target>
   <ImportGroup Label="ExtensionSettings" />
-  <ImportGroup Label="Shared" />
+  <ImportGroup Label="Shared">
+    <Import Project="..\PS\PS.vcxitems" Label="Shared" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="QtBuildTemp.props" />
@@ -69,15 +71,15 @@
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)\$(TargetName)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)src\DC;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir)lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)src\PS;$(SolutionDir)src\R3S;$(SolutionDir)src\CDC;$(SolutionDir)src\UDC;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)\$(TargetName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SolutionDir)src\DC;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir)lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)src\PS;$(SolutionDir)src\R3S;$(SolutionDir)src\CDC;$(SolutionDir)src\UDC;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="QtDeploy" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <QtDeploy>true</QtDeploy>
@@ -152,20 +154,6 @@
     <ClCompile Include="ProcessDetailWnd.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDC\CDC.vcxproj">
-      <Project>{20570cb5-990f-4172-a066-c2646edcd4ef}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\PS\R3PS.vcxproj">
-      <Project>{68104123-3737-4a76-905d-773485f5a851}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\R3S\R3S.vcxproj">
-      <Project>{6cddda21-53e6-4aa1-83e5-228918d3fe8f}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\UDC\UDC.vcxproj">
-      <Project>{7f3ff219-7e76-4dda-a9ec-8d0504ac413b}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <QtUic Include="MainWindow.ui" />
     <QtUic Include="ObjectTypeDetailWnd.ui" />
     <QtUic Include="ProcessDetailWnd.ui" />
@@ -185,6 +173,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Util.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DC\DC.vcxproj">
+      <Project>{427ce21e-a462-4c21-99b2-56e06f1381c1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\D\D.vcxproj">
+      <Project>{f75e7882-943f-432c-9fe7-df4d86572af4}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

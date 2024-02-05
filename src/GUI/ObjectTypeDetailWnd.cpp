@@ -1,7 +1,7 @@
 #include "ObjectTypeDetailWnd.hpp"
-#include "Collector.hpp"
+#include "DC.hpp"
 
-extern CollectorDriver* g_pCollectorDriver;
+extern Driver* g_pDriver;
 
 ObjectTypeDetailWnd::ObjectTypeDetailWnd(
     PVOID pObjectType,
@@ -26,7 +26,7 @@ ObjectTypeDetailWnd::ObjectTypeDetailWnd(
 ObjectTypeDetailWnd::~ObjectTypeDetailWnd() {}
 
 void ObjectTypeDetailWnd::RefershObjectTypeDetail(bool checked){
-    ObjectTypeDetail Detail = g_pCollectorDriver->CollectObjectTypeDetail(m_pObjectType);
+    ObjectTypeDetail Detail = g_pDriver->CollectObjectTypeDetail(m_pObjectType);
 
     ULONG i = 0;
     ADD_INFO_TABLE_VALUE(Q_HEX_NUMBER_STRING(Detail.m_pObjectType));
