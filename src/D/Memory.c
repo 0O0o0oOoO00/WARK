@@ -448,3 +448,162 @@ IOCTL_FUNC(Cr3WriteMemory) {
 	ExFreePool(pWriteMemoryInfo);
 	SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_SUCCESS);
 }
+
+PVOID __MdlMapMemory(
+	_Inout_ PMEMORY_MAP pMemoryMap
+) {
+	if (!pMemoryMap) {
+		return STATUS_UNSUCCESSFUL;
+	}
+
+	KAPC_STATE ApcState = { 0 };
+	KeAttachProcess(pMemoryMap->pEprocess, &ApcState);
+
+	PMDL pMdl = IoAllocateMdl(pMemoryMap->pVirtualToMap, pMemoryMap->ulLength, FALSE, FALSE, NULL);
+	if (!pMdl) {
+		goto Error;
+	}
+	pMemoryMap->Parameter.pMdl = pMdl;
+
+	MmBuildMdlForNonPagedPool(pMdl);
+	MmProbeAndLockPages(pMdl, KernelMode, IoModifyAccess);
+	pMemoryMap->Flag.Mdl.bIsProbeAndLock = TRUE;
+
+	PVOID p = MmGetSystemAddressForMdlSafe(pMdl, NormalPagePriority);
+	if (!p) {
+		goto Error;
+	}
+
+	KeUnstackDetachProcess(&ApcState);
+	return p;
+
+Error:
+	KeUnstackDetachProcess(&ApcState);
+	return NULL;
+}
+
+VOID __MdlUnmapMemory(
+	_Inout_ PMEMORY_MAP pMemoryMap
+) {
+	if (!pMemoryMap) {
+		return;
+	}
+
+	KAPC_STATE ApcState = { 0 };
+	KeAttachProcess(pMemoryMap->pEprocess, &ApcState);
+
+
+	if (pMemoryMap->Flag.Mdl.bIsProbeAndLock) {
+		MmUnlockPages(pMemoryMap->Parameter.pMdl);
+		pMemoryMap->Flag.Mdl.bIsProbeAndLock = FALSE;
+	}
+	
+	if (pMemoryMap->Parameter.pMdl) {
+		IoFreeMdl(pMemoryMap->Parameter.pMdl);
+		pMemoryMap->Parameter.pMdl = NULL;
+	}
+	KeUnstackDetachProcess(&ApcState);
+}
+
+PVOID __PhysicalMapMemory(
+	_Inout_ PMEMORY_MAP pMemoryMap
+) {
+	if (!pMemoryMap) {
+		return NULL;
+	}
+
+	KAPC_STATE ApcState = { 0 };
+	KeAttachProcess(pMemoryMap->pEprocess, &ApcState);
+
+	PHYSICAL_ADDRESS PhysicalAddress = MmGetPhysicalAddress(pMemoryMap->pVirtualToMap);
+	if (!PhysicalAddress.QuadPart) {
+		goto Error;
+	}
+	pMemoryMap->Parameter.PhysicalAddress = PhysicalAddress;
+
+	PVOID p = MmMapIoSpace(PhysicalAddress, pMemoryMap->ulLength, MmNonCached);
+	if (!p) {
+		goto Error;
+	}
+
+	KeUnstackDetachProcess(&ApcState);
+	return STATUS_SUCCESS;
+
+Error:
+	KeUnstackDetachProcess(&ApcState);
+	return NULL;
+}
+
+VOID __PhysicalUnmapMemory(
+	_Inout_ PMEMORY_MAP pMemoryMap
+) {
+	if (!pMemoryMap) {
+		return;
+	}
+
+	if (pMemoryMap->Parameter.PhysicalAddress.QuadPart) {
+		MmUnmapIoSpace(pMemoryMap->pVirtual, pMemoryMap->ulLength);
+		pMemoryMap->Parameter.PhysicalAddress.QuadPart = 0;
+	}
+}
+
+VOID MmUnmapMemory(
+	_Inout_ PMEMORY_MAP pMemoryMap
+) {
+	if (!pMemoryMap) {
+		return;
+	}
+
+	switch (pMemoryMap->Method) {
+	case MdlMap:
+		__MdlUnmapMemory(pMemoryMap);
+		break;
+	case PhysicalMap:
+		__PhysicalUnmapMemory(pMemoryMap);
+		break;
+	default:
+		break;
+	}
+
+	pMemoryMap->pVirtual = NULL;
+}
+
+NTSTATUS MmMapMemory(
+	_Out_ PMEMORY_MAP pMemoryMap,
+	_Out_ PVOID* ppVirtual,
+	_In_ PEPROCESS pEprocess,
+	_In_ PVOID pVirtualToMap,
+	_In_ MAP_METHOD Method,
+	_In_ ULONG ulLength
+) {
+	if (!pMemoryMap || !ppVirtual || !ulLength) {
+		return STATUS_UNSUCCESSFUL;
+	}
+
+	pMemoryMap->pEprocess = pEprocess;
+	pMemoryMap->Method = Method;
+	pMemoryMap->ulLength = ulLength;
+	pMemoryMap->pVirtualToMap = pVirtualToMap;
+
+	PVOID pVirtual = NULL;
+	switch (Method) {
+	case MdlMap:
+		pVirtual = __MdlMapMemory(pMemoryMap);
+		break;
+	case PhysicalMap:
+		pVirtual = __PhysicalMapMemory(pMemoryMap);
+		break;
+	default:
+		return STATUS_UNSUCCESSFUL;
+		break;
+	}
+
+	if (!pVirtual) {
+		MmUnmapMemory(pMemoryMap);
+		return STATUS_UNSUCCESSFUL;
+	}
+
+	pMemoryMap->pVirtual = pVirtual;
+	*ppVirtual = pVirtual;
+	return STATUS_SUCCESS;
+}
