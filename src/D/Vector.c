@@ -74,8 +74,13 @@ PVOID VectorIndexOf(
 		return NULL;
 	}
 
-	// TODO: switch entry page
-	PVECTOR_ENTRY pEntry = CONTAINING_RECORD(pVector->pVectorEntry->EntryLink.Flink, VECTOR_ENTRY, EntryLink);
+	PLIST_ENTRY pList = &(pVector->pVectorEntry->EntryLink);
+	ULONG ulPageIndex = ulIndex / MAXIMUM_ITEMS_PRE_VECTOR_ENTRY;
+	for (ULONG i = 0; i < ulPageIndex; i++) {
+		pList = pList->Blink;
+	}
+
+	PVECTOR_ENTRY pEntry = CONTAINING_RECORD(pList, VECTOR_ENTRY, EntryLink);
 	return (PVOID)(pEntry->Data + (ulIndex % MAXIMUM_ITEMS_PRE_VECTOR_ENTRY) * pVector->ulTypeSize);
 }
 
