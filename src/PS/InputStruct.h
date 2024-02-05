@@ -14,6 +14,7 @@ typedef struct _READ_MEMORY_INFO {
 
 typedef struct _WRITE_MEMORY_INFO {
 	PVOID pEprocess;
+	PVOID VirtualAddress;
 	ULONG ulWriteSize;
 	UCHAR Data[];
 }WRITE_MEMORY_INFO, * PWRITE_MEMORY_INFO;

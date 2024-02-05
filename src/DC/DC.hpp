@@ -20,13 +20,13 @@ public:
 	ObjectTypeDetail CollectObjectTypeDetail(PVOID pObjectType);
 
 	PVOID MdlReadMemory(PVOID pEprocess, PVOID VirtualAddress, ULONG ulReadLength);
-	PVOID MdlWriteMemory(PVOID pEprocess, PVOID pBuffer, ULONG ulWriteLength);
+	PVOID MdlWriteMemory(PVOID pEprocess, PVOID VirtualAddress, PVOID pBuffer, ULONG ulWriteLength);
 
 	PVOID PhysicalReadMemory(PVOID pEprocess, PVOID VirtualAddress, ULONG ulReadLength);
-	PVOID PhysicalWriteMemory(PVOID pEprocess, PVOID pBuffer, ULONG ulWriteLength);
+	PVOID PhysicalWriteMemory(PVOID pEprocess, PVOID VirtualAddress, PVOID pBuffer, ULONG ulWriteLength);
 
 	PVOID Cr3ReadMemory(PVOID pEprocess, PVOID VirtualAddress, ULONG ulReadLength);
-	PVOID Cr3WriteMemory(PVOID pEprocess, PVOID pBuffer, ULONG ulWriteLength);
+	PVOID Cr3WriteMemory(PVOID pEprocess, PVOID VirtualAddress, PVOID pBuffer, ULONG ulWriteLength);
 
 	BOOL TerminateProcess(PVOID pEprocess);
 };

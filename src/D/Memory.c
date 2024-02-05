@@ -15,74 +15,40 @@ NTSTATUS MmMdlReadMemory(
 		return STATUS_UNSUCCESSFUL;
 	}
 
-	KAPC_STATE ApcState;
-	KeAttachProcess(pEprocess, &ApcState);
+	MEMORY_MAP MemoryMap = { 0 };
+	PVOID pVirtual = NULL;
 
-	PMDL pMdl = IoAllocateMdl(VirtualAddress, ulReadSize, FALSE, FALSE, NULL);
-	if (!pMdl) {
-		KeUnstackDetachProcess(&ApcState);
-		return STATUS_UNSUCCESSFUL;
-	}
-	MmBuildMdlForNonPagedPool(pMdl);
-	MmProbeAndLockPages(pMdl, KernelMode, IoModifyAccess);
-	PVOID p = MmGetSystemAddressForMdlSafe(pMdl, NormalPagePriority);
-	if (!p) {
-		MmUnlockPages(pMdl);
-		IoFreeMdl(pMdl);
-		KeUnstackDetachProcess(&ApcState);
+	if (!NT_SUCCESS(MmMdlMapMemory(&MemoryMap, &pVirtual, pEprocess, VirtualAddress, ulReadSize))) {
 		return STATUS_UNSUCCESSFUL;
 	}
 
-	RtlCopyMemory(pBuffer, p, ulReadSize);
+	RtlCopyMemory(pBuffer, pVirtual, ulReadSize);
 
-	MmUnlockPages(pMdl);
-	IoFreeMdl(pMdl);
-	KeUnstackDetachProcess(&ApcState);
+	MmUnmapMemory(&MemoryMap);
 	return STATUS_SUCCESS;
 }
 
-PVOID MmMdlWriteMemory(
+NTSTATUS MmMdlWriteMemory(
 	_In_ PEPROCESS pEprocess,
+	_In_ PVOID VirtualAddress,
 	_In_ PVOID pBuffer,
 	_In_ ULONG ulWriteSize
 ) {
-	if (!pEprocess || !pBuffer || !ulWriteSize) {
-		return NULL;
+	if (!pEprocess || !VirtualAddress || !pBuffer || !ulWriteSize) {
+		return STATUS_UNSUCCESSFUL;
 	}
 
-	KAPC_STATE ApcState;
-	KeAttachProcess(pEprocess, &ApcState);
+	MEMORY_MAP MemoryMap = { 0 };
+	PVOID pVirtual = NULL;
 
-	PVOID VirtualAddress = MmAllocateR3Memory(pEprocess, ulWriteSize);
-	if (!VirtualAddress) {
-		KeUnstackDetachProcess(&ApcState);
-		return NULL;
+	if (!NT_SUCCESS(MmMdlMapMemory(&MemoryMap, &pVirtual, pEprocess, VirtualAddress, ulWriteSize))) {
+		return STATUS_UNSUCCESSFUL;
 	}
 
-	PMDL pMdl = IoAllocateMdl(VirtualAddress, ulWriteSize, FALSE, FALSE, NULL);
-	if (!pMdl) {
-		// TODO: mdl free allocated r3 memory
-		KeUnstackDetachProcess(&ApcState);
-		return NULL;
-	}
+	RtlCopyMemory(pVirtual, pBuffer, ulWriteSize);
 
-	MmBuildMdlForNonPagedPool(pMdl);
-	MmProbeAndLockPages(pMdl, KernelMode, IoModifyAccess);
-	PVOID p = MmGetSystemAddressForMdlSafe(pMdl, NormalPagePriority);
-	if (!p) {
-		// TODO: mdl free allocated r3 memory
-		MmUnlockPages(pMdl);
-		IoFreeMdl(pMdl);
-		KeUnstackDetachProcess(&ApcState);
-		return NULL;
-	}
-
-	RtlCopyMemory(p, pBuffer, ulWriteSize);
-
-	MmUnlockPages(pMdl);
-	IoFreeMdl(pMdl);
-	KeUnstackDetachProcess(&ApcState);
-	return p;
+	MmUnmapMemory(&MemoryMap);
+	return STATUS_SUCCESS;
 }
 
 NTSTATUS MmPhysicalReadMemory(
@@ -95,62 +61,40 @@ NTSTATUS MmPhysicalReadMemory(
 		return STATUS_UNSUCCESSFUL;
 	}
 
-	KAPC_STATE ApcState;
-	KeAttachProcess(pEprocess, &ApcState);
+	MEMORY_MAP MemoryMap = { 0 };
+	PVOID pVirtual = NULL;
 
-	PHYSICAL_ADDRESS PhysicalAddress = MmGetPhysicalAddress(VirtualAddress);
-	if (!PhysicalAddress.QuadPart) {
-		KeUnstackDetachProcess(&ApcState);
-		return STATUS_UNSUCCESSFUL;
-	}
-	PVOID p = MmMapIoSpace(PhysicalAddress, ulReadSize, MmNonCached);
-	if (!p) {
-		KeUnstackDetachProcess(&ApcState);
+	if (!NT_SUCCESS(MmPhysicalMapMemory(&MemoryMap, &pVirtual, pEprocess, VirtualAddress, ulReadSize))) {
 		return STATUS_UNSUCCESSFUL;
 	}
 
-	RtlCopyMemory(pBuffer, p, ulReadSize);
+	RtlCopyMemory(pBuffer, pVirtual, ulReadSize);
 
-	MmUnmapIoSpace(p, ulReadSize);
-	KeUnstackDetachProcess(&ApcState);
+	MmUnmapMemory(&MemoryMap);
 	return STATUS_SUCCESS;
 }
 
-PVOID MmPhysicalWriteMemory(
+NTSTATUS MmPhysicalWriteMemory(
 	_In_ PEPROCESS pEprocess,
+	_In_ PVOID VirtualAddress,
 	_In_ PVOID pBuffer,
 	_In_ ULONG ulWriteSize
 ) {
-	if (!pEprocess || !pBuffer || !ulWriteSize) {
-		return NULL;
+	if (!pEprocess || !VirtualAddress || !pBuffer || !ulWriteSize) {
+		return STATUS_UNSUCCESSFUL;
 	}
 
-	KAPC_STATE ApcState;
-	KeAttachProcess(pEprocess, &ApcState);
+	MEMORY_MAP MemoryMap = { 0 };
+	PVOID pVirtual = NULL;
 
-	PVOID VirtualAddress = MmAllocateR3Memory(pEprocess, ulWriteSize);
-	if (!VirtualAddress) {
-		return NULL;
+	if (!NT_SUCCESS(MmPhysicalMapMemory(&MemoryMap, &pVirtual, pEprocess, VirtualAddress, ulWriteSize))) {
+		return STATUS_UNSUCCESSFUL;
 	}
 
-	PHYSICAL_ADDRESS PhysicalAddress = MmGetPhysicalAddress(VirtualAddress);
-	if (!PhysicalAddress.QuadPart) {
-		// TODO: physical free allocated r3 memory
-		KeUnstackDetachProcess(&ApcState);
-		return NULL;
-	}
-	PVOID p = MmMapIoSpace(PhysicalAddress, ulWriteSize, MmNonCached);
-	if (!p) {
-		// TODO: physical free allocated r3 memory
-		KeUnstackDetachProcess(&ApcState);
-		return NULL;
-	}
+	RtlCopyMemory(pVirtual, pBuffer, ulWriteSize);
 
-	RtlCopyMemory(p, pBuffer, ulWriteSize);
-
-	MmUnmapIoSpace(p, ulWriteSize);
-	KeUnstackDetachProcess(&ApcState);
-	return p;
+	MmUnmapMemory(&MemoryMap);
+	return STATUS_SUCCESS;
 }
 
 NTSTATUS MmCr3ReadMemory(
@@ -180,37 +124,34 @@ NTSTATUS MmCr3ReadMemory(
 	return STATUS_SUCCESS;
 }
 
-PVOID MmCr3WriteMemory(
+NTSTATUS MmCr3WriteMemory(
 	_In_ PEPROCESS pEprocess,
+	_In_ PVOID VirtualAddress,
 	_In_ PVOID pBuffer,
 	_In_ ULONG ulWriteSize
 ) {
-	if (!pEprocess || !pBuffer || !ulWriteSize) {
-		return NULL;
+	if (!pEprocess || !VirtualAddress || !pBuffer || !ulWriteSize) {
+		return STATUS_UNSUCCESSFUL;
 	}
 
-	PVOID pR3 = MmAllocateR3Memory(pEprocess, ulWriteSize);
-	if (!pR3) {
-		return NULL;
-	}
 	ULONGLONG ullProcessCr3 = GetProcessCr3(pEprocess);
 	if (!ullProcessCr3) {
 		// TODO: cr3 free allocated r3 memory
-		return NULL;
+		return STATUS_UNSUCCESSFUL;
 	}
 	ULONGLONG ullOldCr3 = 0;
 	if (!NT_SUCCESS(SwitchCr3(ullProcessCr3, &ullOldCr3))) {
 		// TODO: cr3 free allocated r3 memory
-		return NULL;
+		return STATUS_UNSUCCESSFUL;
 	}
 
-	RtlCopyMemory(pR3, pBuffer, ulWriteSize);
+	RtlCopyMemory(VirtualAddress, pBuffer, ulWriteSize);
 
 	if (!NT_SUCCESS(SwitchCr3(ullOldCr3, NULL))) {
 		// TODO: cr3 free allocated r3 memory
-		return NULL;
+		return STATUS_UNSUCCESSFUL;
 	}
-	return pR3;
+	return STATUS_SUCCESS;
 }
 
 IOCTL_FUNC(MdlReadMemory) {
@@ -260,35 +201,36 @@ IOCTL_FUNC(MdlReadMemory) {
 IOCTL_FUNC(MdlWriteMemory) {
 	IO_PACKAGE IoPackage;
 	if (!NT_SUCCESS(InitializeIoPackage(&IoPackage, pIrpData))) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
 	ULONG ulStructSize = OutputBufferLengthOfIoPackage(&IoPackage);
 	if (!ulStructSize) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 	PWRITE_MEMORY_INFO pWriteMemoryInfo = MmAllocateZeroedNonPagedMemory(ulStructSize);
 	if (!pWriteMemoryInfo) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
-	PVOID pR3 = MmMdlWriteMemory(pWriteMemoryInfo->pEprocess, pWriteMemoryInfo->Data, pWriteMemoryInfo->ulWriteSize);
-	if (!pR3) {
+	NTSTATUS Status = MmMdlWriteMemory(
+		pWriteMemoryInfo->pEprocess, 
+		pWriteMemoryInfo->VirtualAddress,
+		pWriteMemoryInfo->Data, 
+		pWriteMemoryInfo->ulWriteSize
+	);
+	if (!NT_SUCCESS(Status)) {
 		ExFreePool(pWriteMemoryInfo);
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
-	}
-	if (!NT_SUCCESS(WriteToIoPackage(&IoPackage, &pR3, sizeof(PVOID), NULL, FALSE))) {
-		ExFreePool(pWriteMemoryInfo);
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
 	ExFreePool(pWriteMemoryInfo);
 	SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_SUCCESS);
+	return;
+
+Error:
+	SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
+	return;
 }
 
 IOCTL_FUNC(PhysicalReadMemory) {
@@ -339,35 +281,36 @@ IOCTL_FUNC(PhysicalReadMemory) {
 IOCTL_FUNC(PhysicalWriteMemory) {
 	IO_PACKAGE IoPackage;
 	if (!NT_SUCCESS(InitializeIoPackage(&IoPackage, pIrpData))) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
 	ULONG ulStructSize = OutputBufferLengthOfIoPackage(&IoPackage);
 	if (!ulStructSize) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 	PWRITE_MEMORY_INFO pWriteMemoryInfo = MmAllocateZeroedNonPagedMemory(ulStructSize);
 	if (!pWriteMemoryInfo) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
-	PVOID pR3 = MmPhysicalWriteMemory(pWriteMemoryInfo->pEprocess, pWriteMemoryInfo->Data, pWriteMemoryInfo->ulWriteSize);
-	if (!pR3) {
+	NTSTATUS Status = MmPhysicalWriteMemory(
+		pWriteMemoryInfo->pEprocess,
+		pWriteMemoryInfo->VirtualAddress,
+		pWriteMemoryInfo->Data,
+		pWriteMemoryInfo->ulWriteSize
+	);
+	if (!NT_SUCCESS(Status)) {
 		ExFreePool(pWriteMemoryInfo);
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
-	}
-	if (!NT_SUCCESS(WriteToIoPackage(&IoPackage, &pR3, sizeof(PVOID), NULL, FALSE))) {
-		ExFreePool(pWriteMemoryInfo);
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
 	ExFreePool(pWriteMemoryInfo);
 	SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_SUCCESS);
+	return;
+
+Error:
+	SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
+	return;
 }
 
 IOCTL_FUNC(Cr3ReadMemory) {
@@ -418,35 +361,36 @@ IOCTL_FUNC(Cr3ReadMemory) {
 IOCTL_FUNC(Cr3WriteMemory) {
 	IO_PACKAGE IoPackage;
 	if (!NT_SUCCESS(InitializeIoPackage(&IoPackage, pIrpData))) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
 	ULONG ulStructSize = OutputBufferLengthOfIoPackage(&IoPackage);
 	if (!ulStructSize) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 	PWRITE_MEMORY_INFO pWriteMemoryInfo = MmAllocateZeroedNonPagedMemory(ulStructSize);
 	if (!pWriteMemoryInfo) {
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
-	PVOID pR3 = MmCr3WriteMemory(pWriteMemoryInfo->pEprocess, pWriteMemoryInfo->Data, pWriteMemoryInfo->ulWriteSize);
-	if (!pR3) {
+	NTSTATUS Status = MmCr3WriteMemory(
+		pWriteMemoryInfo->pEprocess,
+		pWriteMemoryInfo->VirtualAddress,
+		pWriteMemoryInfo->Data,
+		pWriteMemoryInfo->ulWriteSize
+	);
+	if (!NT_SUCCESS(Status)) {
 		ExFreePool(pWriteMemoryInfo);
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
-	}
-	if (!NT_SUCCESS(WriteToIoPackage(&IoPackage, &pR3, sizeof(PVOID), NULL, FALSE))) {
-		ExFreePool(pWriteMemoryInfo);
-		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
-		return;
+		goto Error;
 	}
 
 	ExFreePool(pWriteMemoryInfo);
 	SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_SUCCESS);
+	return;
+
+Error:
+	SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
+	return;
 }
 
 PVOID __MdlMapMemory(

@@ -148,6 +148,7 @@ PVOID Driver::MdlReadMemory(
 
 PVOID Driver::MdlWriteMemory(
 	PVOID pEprocess,
+	PVOID VirtualAddress,
 	PVOID pBuffer,
 	ULONG ulWriteLength
 ) {
@@ -160,6 +161,7 @@ PVOID Driver::MdlWriteMemory(
 		return NULL;
 	}
 	pWriteMemoryInfo->pEprocess = pEprocess;
+	pWriteMemoryInfo->VirtualAddress = VirtualAddress;
 	pWriteMemoryInfo->ulWriteSize = ulWriteLength;
 	RtlCopyMemory(pWriteMemoryInfo->Data, pBuffer, ulWriteLength);
 	PVOID p = NULL;
@@ -186,6 +188,7 @@ PVOID Driver::PhysicalReadMemory(
 
 PVOID Driver::PhysicalWriteMemory(
 	PVOID pEprocess,
+	PVOID VirtualAddress,
 	PVOID pBuffer,
 	ULONG ulWriteLength
 ) {
@@ -198,6 +201,7 @@ PVOID Driver::PhysicalWriteMemory(
 		return NULL;
 	}
 	pWriteMemoryInfo->pEprocess = pEprocess;
+	pWriteMemoryInfo->VirtualAddress = VirtualAddress;
 	pWriteMemoryInfo->ulWriteSize = ulWriteLength;
 	RtlCopyMemory(pWriteMemoryInfo->Data, pBuffer, ulWriteLength);
 	PVOID p = NULL;
@@ -224,6 +228,7 @@ PVOID Driver::Cr3ReadMemory(
 
 PVOID Driver::Cr3WriteMemory(
 	PVOID pEprocess,
+	PVOID VirtualAddress,
 	PVOID pBuffer,
 	ULONG ulWriteLength
 ) {
@@ -236,6 +241,7 @@ PVOID Driver::Cr3WriteMemory(
 		return NULL;
 	}
 	pWriteMemoryInfo->pEprocess = pEprocess;
+	pWriteMemoryInfo->VirtualAddress = VirtualAddress;
 	pWriteMemoryInfo->ulWriteSize = ulWriteLength;
 	RtlCopyMemory(pWriteMemoryInfo->Data, pBuffer, ulWriteLength);
 	PVOID p = NULL;

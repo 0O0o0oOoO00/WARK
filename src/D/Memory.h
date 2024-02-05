@@ -9,8 +9,9 @@ NTSTATUS MmMdlReadMemory(
 	_In_ ULONG ulReadSize
 );
 
-PVOID MmMdlWriteMemory(
+NTSTATUS MmMdlWriteMemory(
 	_In_ PEPROCESS pEprocess,
+	_In_ PVOID VirtualAddress,
 	_In_ PVOID pBuffer,
 	_In_ ULONG ulWriteSize
 );
@@ -22,8 +23,9 @@ NTSTATUS MmPhysicalReadMemory(
 	_In_ ULONG ulReadSize
 );
 
-PVOID MmPhysicalWriteMemory(
+NTSTATUS MmPhysicalWriteMemory(
 	_In_ PEPROCESS pEprocess,
+	_In_ PVOID VirtualAddress,
 	_In_ PVOID pBuffer,
 	_In_ ULONG ulWriteSize
 );
@@ -35,8 +37,9 @@ NTSTATUS MmCr3ReadMemory(
 	_In_ ULONG ulReadSize
 );
 
-PVOID MmCr3WriteMemory(
+NTSTATUS MmCr3WriteMemory(
 	_In_ PEPROCESS pEprocess,
+	_In_ PVOID VirtualAddress,
 	_In_ PVOID pBuffer,
 	_In_ ULONG ulWriteSize
 );
