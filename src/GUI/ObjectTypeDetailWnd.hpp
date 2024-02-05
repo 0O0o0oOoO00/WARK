@@ -3,6 +3,7 @@
 #include <QtWidgets/QWidget>
 #include "ObjectTypeDetailWndUI.h"
 #include <Windows.h>
+#include "Util.hpp"
 
 static CONST CHAR* OBJECT_TYPE_DETAIL_PROPERTY_NAME_LIST[] = {
     "ObjectType",
@@ -34,17 +35,8 @@ static CONST CHAR* OBJECT_TYPE_DETAIL_PROPERTY_NAME_LIST[] = {
 #define OBJECT_TYPE_DETAIL_PROPERTY_INDEX 0
 #define OBJECT_TYPE_DETAIL_VALUE_INDEX 1
 
-#define ADD_TABLE_ITEM(table, index, text) \
-    m_Ui.table->setItem(i++, index, new QTableWidgetItem(QString(text)))
-
 #define ADD_INFO_TABLE_VALUE(text) \
     ADD_TABLE_ITEM(InfoTable, OBJECT_TYPE_DETAIL_VALUE_INDEX, text)
-
-#define Q_HEX_NUMBER_STRING(n) \
-    ("0x" + QString::number((ULONGLONG)(n), 16))
-
-#define Q_NUMBER_STRING(n) \
-    QString::number((n))
 
 class ObjectTypeDetailWnd : public QWidget {
     Q_OBJECT
