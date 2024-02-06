@@ -26,6 +26,9 @@
     <ClInclude Include="Util.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Module.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Object.cpp">
@@ -38,6 +41,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Util.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

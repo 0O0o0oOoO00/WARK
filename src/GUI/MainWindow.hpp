@@ -26,6 +26,13 @@
 
 #define SHOW_OBJECT_TYPE_DETAIL_ACTION_NAME "Detail"
 
+#define MODULE_INFO_NAME_INDEX 0
+#define MODULE_INFO_LOAD_COUNT_INDEX 1
+#define MODULE_INFO_DLL_BASE_INDEX 2
+#define MODULE_INFO_ENTRY_POINT_INDEX 3
+#define MODULE_INFO_SIZE_OF_IMAGE_INDEX 4
+#define MODULE_INFO_FILE_INDEX 5
+
 class MainWindow : public QWidget {
     Q_OBJECT
 
@@ -52,4 +59,5 @@ private:
     void OpenProcessFolder(bool checked);
     void ShowObjectTypeDetailInfo(bool checked);
     void ShowObjectTypeInfoTableMenu(const QPoint& pos);
+    void RefreshModuleInfo(bool checked = false);
 };

@@ -3,6 +3,7 @@
 #include "Vector.h"
 #include "OutputStruct.h"
 #include "Util.h"
+#include "Ioctl.h"
 
 PEPROCESS g_pTargetProcess;
 
@@ -15,7 +16,7 @@ NTSTATUS EnumModule(
 	}
 
 	PKLDR_DATA_TABLE_ENTRY pKldr = CONTAINING_RECORD(&PsLoadedModuleList, KLDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
-	PLIST_ENTRY pFirstList = &PsLoadedModuleList;
+	PLIST_ENTRY pFirstList = PsLoadedModuleList.Flink;
 	PLIST_ENTRY pList = pFirstList;
 
 	do {
@@ -56,7 +57,7 @@ PVOID GetNtoskrnlBase() {
 	} while (pList != pFirstList);
 }
 
-ENUM_STATUS CollectModuleInfo(
+ENUM_STATUS CollectModuleInfoCallback(
 	_In_ PKLDR_DATA_TABLE_ENTRY pKldrDataTableEntry, 
 	_In_opt_ PVOID Parameter
 ) {
@@ -73,7 +74,7 @@ ENUM_STATUS CollectModuleInfo(
 	Info.usLoadCount = pKldrDataTableEntry->LoadCount;
 
 	if (pKldrDataTableEntry->BaseDllName.Buffer) {
-		PVOID pR3BaseDllName = SendUnicodeStringToR3(
+		PVOID pR3BaseDllName = SendStringToR3(
 			g_pTargetProcess,
 			&(pKldrDataTableEntry->BaseDllName)
 			);
@@ -84,11 +85,10 @@ ENUM_STATUS CollectModuleInfo(
 	}
 
 	if (pKldrDataTableEntry->FullDllName.Buffer) {
-		PVOID pR3FullDllName = SendDataToR3(
+		PVOID pR3FullDllName = SendStringToR3(
 			g_pTargetProcess,
-			pKldrDataTableEntry->FullDllName.Buffer,
-			pKldrDataTableEntry->FullDllName.MaximumLength
-		);
+			&(pKldrDataTableEntry->FullDllName)
+			);
 		if (!pR3FullDllName) {
 			goto Error;
 		}
@@ -107,4 +107,39 @@ ENUM_STATUS CollectModuleInfo(
 	return ENUM_CONTINUE;
 Error:
 	return ENUM_ERROR;
+}
+
+IOCTL_FUNC(CollectModuleInfo) {
+	IO_PACKAGE IoPackage;
+	if (!NT_SUCCESS(InitializeIoPackage(&IoPackage, pIrpData))) {
+		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
+		return;
+	}
+
+	PVECTOR pModuleInfoVector = NewVector(sizeof(PMODULE_INFO));
+	if (!pModuleInfoVector) {
+		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
+		return;
+	}
+	if (!NT_SUCCESS(EnumModule(CollectModuleInfoCallback, pModuleInfoVector))) {
+		FreeVector(pModuleInfoVector);
+		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
+		return;
+	}
+
+	PVOID pR3InfoVector = SendVectorContentToR3(g_pTargetProcess, pModuleInfoVector);
+	if (!pR3InfoVector) {
+		FreeVector(pModuleInfoVector);
+		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
+		return;
+	}
+
+	if (!NT_SUCCESS(WriteToIoPackage(&IoPackage, &pR3InfoVector, sizeof(PVOID), NULL, FALSE))) {
+		FreeVector(pModuleInfoVector);
+		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
+		return;
+	}
+
+	SET_IRP_DATA_STATUS(pIrpData, VectorItemsCount(pModuleInfoVector), STATUS_SUCCESS);
+	FreeVector(pModuleInfoVector);
 }

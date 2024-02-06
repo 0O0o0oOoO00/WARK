@@ -1,8 +1,10 @@
 #include "DC.hpp"
+#include "Define.hpp"
 #include "Util.hpp"
 #include "ControlCode.h"
 #include "DriverDefine.h"
 #include "InputStruct.h"
+#include "OutputStruct.h"
 
 Driver::Driver()
 	: m_hDriver(INVALID_HANDLE_VALUE)
@@ -258,3 +260,27 @@ BOOL Driver::TerminateProcess(PVOID pEprocess) {
 	return DeviceIoControl(m_hDriver, IOCTL_TERMINATE_PROCESS, &pEprocess, sizeof(PVOID), NULL, 0, NULL, NULL);
 }
 
+Vector<ModuleInfo> Driver::CollectModuleInfo() {
+	Vector<ModuleInfo> ModuleInfoVector = *new Vector<ModuleInfo>;
+
+	PMODULE_INFO* pModuleInfoList = NULL;
+	DWORD dwCount = 0;
+
+	if (m_hDriver == INVALID_HANDLE_VALUE) {
+		goto Return;
+	}
+
+	if (!DeviceIoControl(m_hDriver, IOCTL_COLLECT_MODULE_INFO, NULL, 0, &pModuleInfoList, sizeof(POBJECT_TYPE_INFO*), &dwCount, NULL)) {
+		goto Return;
+	}
+	if (!pModuleInfoList) {
+		goto Return;
+	}
+
+	for (ULONG i = 0; i < dwCount; i++) {
+		ModuleInfoVector.push_back(*(new ModuleInfo(pModuleInfoList[i])));
+	}
+
+Return:
+	return ModuleInfoVector;
+}

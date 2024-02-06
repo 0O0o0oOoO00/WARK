@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_Ui.ProcessInfoRefreshButton, &QPushButton::clicked, this, &MainWindow::RefreshProcessInfo);
     connect(m_Ui.ObjectTypeInfoRefreshButton, &QPushButton::clicked, this, &MainWindow::RefreshObjectTypeInfo);
 
+    connect(m_Ui.ModuleInfoRefreshButton, &QPushButton::clicked, this, &MainWindow::RefreshModuleInfo);
 }
 
 MainWindow::~MainWindow() {
@@ -140,4 +141,23 @@ void MainWindow::ShowObjectTypeDetailInfo(bool checked) {
     }
     ObjectTypeDetailWnd* pDetail = new ObjectTypeDetailWnd(pObjectType);
     pDetail->show();
+}
+
+void MainWindow::RefreshModuleInfo(bool checked) {
+    m_Ui.ModuleInfoTable->clearContents();
+
+    Vector<ModuleInfo> ModuleInfoVector = g_pDriver->CollectModuleInfo();
+    ULONG ulCount = ModuleInfoVector.size();
+    m_Ui.ModuleInfoTable->setRowCount(ulCount);
+    for (ULONG i = 0; i < ulCount; i++) {
+        ModuleInfo Info = ModuleInfoVector[i];
+        m_Ui.ModuleInfoTable->setItem(i, MODULE_INFO_NAME_INDEX, new QTableWidgetItem(QString::fromStdWString(Info.m_szBaseDllName)));
+        m_Ui.ModuleInfoTable->setItem(i, MODULE_INFO_LOAD_COUNT_INDEX, new QTableWidgetItem(QString::number(Info.m_usLoadCount)));
+        m_Ui.ModuleInfoTable->setItem(i, MODULE_INFO_DLL_BASE_INDEX, new QTableWidgetItem("0x" + QString::number((ULONGLONG)Info.m_pDllBase, 16)));
+        m_Ui.ModuleInfoTable->setItem(i, MODULE_INFO_ENTRY_POINT_INDEX, new QTableWidgetItem("0x" + QString::number((ULONGLONG)Info.m_pEntryPoint, 16)));
+        m_Ui.ModuleInfoTable->setItem(i, MODULE_INFO_SIZE_OF_IMAGE_INDEX, new QTableWidgetItem("0x" + QString::number((ULONGLONG)Info.m_ulSizeOfImage, 16)));
+        m_Ui.ModuleInfoTable->setItem(i, MODULE_INFO_FILE_INDEX, new QTableWidgetItem(QString::fromStdWString(Info.m_szFullDllName)));
+    }
+    ModuleInfoVector.clear();
+
 }

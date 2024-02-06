@@ -11,3 +11,5 @@ NTSTATUS EnumModule(
 );
 
 PVOID GetNtoskrnlBase();
+
+IOCTL_FUNC(CollectModuleInfo);

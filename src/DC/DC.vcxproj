@@ -21,12 +21,14 @@
   <ItemGroup>
     <ClInclude Include="DC.hpp" />
     <ClInclude Include="Define.hpp" />
+    <ClInclude Include="Module.hpp" />
     <ClInclude Include="Object.hpp" />
     <ClInclude Include="Process.hpp" />
     <ClInclude Include="Util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DC.cpp" />
+    <ClCompile Include="Module.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="Util.cpp" />

@@ -3,6 +3,7 @@
 #include "Define.hpp"
 #include "Process.hpp"
 #include "Object.hpp"
+#include "Module.hpp"
 
 class DLL_EXPORT Driver {
 public:
@@ -29,4 +30,6 @@ public:
 	PVOID Cr3WriteMemory(PVOID pEprocess, PVOID VirtualAddress, PVOID pBuffer, ULONG ulWriteLength);
 
 	BOOL TerminateProcess(PVOID pEprocess);
+
+	Vector<ModuleInfo> CollectModuleInfo();
 };

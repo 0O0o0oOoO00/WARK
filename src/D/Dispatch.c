@@ -4,6 +4,7 @@
 #include "Process.h"
 #include "Object.h"
 #include "Memory.h"
+#include "Module.h"
 
 PDEVICE_OBJECT g_pDeviceObject;
 
@@ -19,7 +20,8 @@ static CONST IOCTL_FUNCTION IOCTL_FUNC_LIST[] = {
 	IoctlPhysicalWriteMemory,
 	IoctlCr3ReadMemory,
 	IoctlCr3WriteMemory,
-	IoctlTerminateProcess
+	IoctlTerminateProcess,
+	IoctlCollectModuleInfo
 };
 
 #define IOCTL_FUNC_COUNT (sizeof(IOCTL_FUNC_LIST) / sizeof(IOCTL_FUNCTION))
