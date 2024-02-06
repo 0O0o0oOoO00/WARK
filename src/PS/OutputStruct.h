@@ -111,4 +111,13 @@ typedef struct _OBJECT_TYPE_DETAIL {
 	USHORT usWaitObjectPointerOffset;
 }OBJECT_TYPE_DETAIL, * POBJECT_TYPE_DETAIL;
 
+typedef struct _MODULE_INFO {
+	PWCHAR pFullDllName;
+	PWCHAR pBaseDllName;
+	PVOID pDllBase;   
+	PVOID pEntryPoint;
+	ULONG ulSizeOfImage;
+	USHORT usLoadCount;
+}MODULE_INFO, * PMODULE_INFO;
+
 #pragma pack()

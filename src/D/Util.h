@@ -63,6 +63,9 @@ PVOID SendDataToR3(
 	_In_ ULONG ulLength
 );
 
+#define SendStringToR3(pEprocess, pString) \
+	SendDataToR3((pEprocess), ((pString)->Buffer), ((pString)->MaximumLength))
+
 NTSTATUS SwitchCr3(
 	_In_ ULONGLONG ullNewCr3,
 	_Out_opt_ PULONGLONG pOldCr3

@@ -1,5 +1,10 @@
 #include "Module.h"
 #include "Undocument.h"
+#include "Vector.h"
+#include "OutputStruct.h"
+#include "Util.h"
+
+PEPROCESS g_pTargetProcess;
 
 NTSTATUS EnumModule(
 	_In_ ENUM_MODULE fnCallback,
@@ -49,4 +54,57 @@ PVOID GetNtoskrnlBase() {
 		}
 		pList = pList->Flink;
 	} while (pList != pFirstList);
+}
+
+ENUM_STATUS CollectModuleInfo(
+	_In_ PKLDR_DATA_TABLE_ENTRY pKldrDataTableEntry, 
+	_In_opt_ PVOID Parameter
+) {
+	if (!pKldrDataTableEntry || !Parameter) {
+		return ENUM_ERROR;
+	}
+
+	PVECTOR pVector = (PVECTOR)Parameter;
+	MODULE_INFO Info = { 0 };
+
+	Info.pDllBase = pKldrDataTableEntry->DllBase;
+	Info.pEntryPoint = pKldrDataTableEntry->EntryPoint;
+	Info.ulSizeOfImage = pKldrDataTableEntry->SizeOfImage;
+	Info.usLoadCount = pKldrDataTableEntry->LoadCount;
+
+	if (pKldrDataTableEntry->BaseDllName.Buffer) {
+		PVOID pR3BaseDllName = SendUnicodeStringToR3(
+			g_pTargetProcess,
+			&(pKldrDataTableEntry->BaseDllName)
+			);
+		if (!pR3BaseDllName) {
+			goto Error;
+		}
+		Info.pBaseDllName = pR3BaseDllName;
+	}
+
+	if (pKldrDataTableEntry->FullDllName.Buffer) {
+		PVOID pR3FullDllName = SendDataToR3(
+			g_pTargetProcess,
+			pKldrDataTableEntry->FullDllName.Buffer,
+			pKldrDataTableEntry->FullDllName.MaximumLength
+		);
+		if (!pR3FullDllName) {
+			goto Error;
+		}
+		Info.pFullDllName = pR3FullDllName;
+	}
+
+	PVOID pR3Info = SendDataToR3(g_pTargetProcess, &Info, sizeof(MODULE_INFO));
+	if (!pR3Info) {
+		goto Error;
+	}
+
+	if (!NT_SUCCESS(VectorPush(pVector, &pR3Info))) {
+		goto Error;
+	}
+
+	return ENUM_CONTINUE;
+Error:
+	return ENUM_ERROR;
 }
