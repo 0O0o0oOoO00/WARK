@@ -53,6 +53,9 @@
     <ClInclude Include="Driver.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="KString.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.c">
@@ -86,6 +89,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Driver.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="KString.c">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
