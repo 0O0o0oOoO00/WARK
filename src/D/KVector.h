@@ -8,39 +8,39 @@ typedef struct _VECTOR_ENTRY {
 	CHAR Data[];
 }VECTOR_ENTRY, * PVECTOR_ENTRY;
 
-typedef struct _VECTOR {
+typedef struct _KVECTOR {
 	ULONG ulTypeSize;
 	union {
 		ULONG ulCount;
 		ULONG ulNextIndex;
 	};
 	PVECTOR_ENTRY pVectorEntry;
-}VECTOR, * PVECTOR;
+}KVECTOR, * PKVECTOR;
 
-PVECTOR NewVector(
+PKVECTOR NewVector(
 	_In_ ULONG ulTypeSize
 );
 PVOID VectorIndexOf(
-	_In_ PVECTOR pVector,
+	_In_ PKVECTOR pVector,
 	_In_ ULONG ulIndex
 );
 NTSTATUS VectorPush(
-	_In_ PVECTOR pVector,
+	_In_ PKVECTOR pVector,
 	_In_ PVOID pItem
 );
 VOID VectorPop(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 );
 ULONG VectorItemsCount(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 );
 ULONG VectorItemsBytesLength(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 );
 VOID FreeVector(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 );
 PVOID SendVectorContentToR3(
 	_In_ PEPROCESS pEprocess,
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 );

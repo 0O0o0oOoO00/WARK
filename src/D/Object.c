@@ -1,5 +1,5 @@
 #include "Object.h"
-#include "Vector.h"
+#include "KVector.h"
 #include "OutputStruct.h"
 #include "Util.h"
 #include "Define.h"
@@ -57,7 +57,7 @@ ENUM_STATUS CollectObjectCallback(
 		return ENUM_ERROR;
 	}
 
-	PVECTOR pR3ObjectInfoVector = (PVECTOR)Parameter;
+	PKVECTOR pR3ObjectInfoVector = (PKVECTOR)Parameter;
 	OBJECT_TYPE_INFO ObjectTypeInfo = { 0 };
 
 	ObjectTypeInfo.pObjectType = pObjectType;
@@ -90,7 +90,7 @@ IOCTL_FUNC(CollectObjectTypeInfo) {
 		return;
 	}
 
-	PVECTOR pR3ObjectInfoVector = NewVector(sizeof(POBJECT_TYPE_INFO));
+	PKVECTOR pR3ObjectInfoVector = NewVector(sizeof(POBJECT_TYPE_INFO));
 	if (!pR3ObjectInfoVector) {
 		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
 		return;

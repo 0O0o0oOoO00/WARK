@@ -1,8 +1,8 @@
-#include "Vector.h"
+#include "KVector.h"
 #include "Util.h"
 
 BOOLEAN NextVectorEntry(
-	_In_ PVECTOR pVector,
+	_In_ PKVECTOR pVector,
 	_Inout_ PVECTOR_ENTRY* ppEntry
 ) {
 	if (!pVector || !ppEntry) {
@@ -20,7 +20,7 @@ BOOLEAN NextVectorEntry(
 }
 
 NTSTATUS VectorAddEntry(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 ) {
 	if (!pVector) {
 		return STATUS_UNSUCCESSFUL;
@@ -38,14 +38,14 @@ NTSTATUS VectorAddEntry(
 	return STATUS_SUCCESS;
 }
 
-PVECTOR NewVector(
+PKVECTOR NewVector(
 	_In_ ULONG ulTypeSize
 ) {
 	if (!ulTypeSize) {
 		return NULL;
 	}
 
-	PVECTOR pVector = MmAllocateZeroedNonPagedMemory(sizeof(VECTOR));
+	PKVECTOR pVector = MmAllocateZeroedNonPagedMemory(sizeof(KVECTOR));
 	if (!pVector) {
 		return NULL;
 	}
@@ -66,7 +66,7 @@ PVECTOR NewVector(
 }
 
 PVOID VectorIndexOf(
-	_In_ PVECTOR pVector,
+	_In_ PKVECTOR pVector,
 	_In_ ULONG ulIndex
 ) {
 	// TODO: vector index check
@@ -85,7 +85,7 @@ PVOID VectorIndexOf(
 }
 
 NTSTATUS VectorPush(
-	_In_ PVECTOR pVector,
+	_In_ PKVECTOR pVector,
 	_In_ PVOID pItem
 ) {
 	if (!pVector || !pItem) {
@@ -104,7 +104,7 @@ NTSTATUS VectorPush(
 }
 
 VOID VectorPop(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 ) {
 	if (!pVector) {
 		return STATUS_UNSUCCESSFUL;
@@ -122,7 +122,7 @@ VOID VectorPop(
 }
 
 ULONG VectorItemsCount(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 ) {
 	if (!pVector) {
 		return 0;
@@ -132,7 +132,7 @@ ULONG VectorItemsCount(
 }
 
 ULONG VectorItemsBytesLength(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 ) {
 	if (!pVector) {
 		return 0;
@@ -142,7 +142,7 @@ ULONG VectorItemsBytesLength(
 }
 
 VOID FreeVector(
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 ) {
 	if (!pVector) {
 		return;
@@ -166,7 +166,7 @@ VOID FreeVector(
 
 PVOID SendVectorContentToR3(
 	_In_ PEPROCESS pEprocess,
-	_In_ PVECTOR pVector
+	_In_ PKVECTOR pVector
 ) {
 	if (!pEprocess || !pVector) {
 		return NULL;

@@ -1,5 +1,5 @@
 #include "Process.h"
-#include "Vector.h"
+#include "KVector.h"
 #include "OutputStruct.h"
 #include "Util.h"
 
@@ -52,7 +52,7 @@ ENUM_STATUS CollectProcessCallback(
 		return ENUM_ERROR;
 	}
 
-	PVECTOR pProcessInfoVector = (PVECTOR)Parameter;
+	PKVECTOR pProcessInfoVector = (PKVECTOR)Parameter;
 	PROCESS_INFO ProcessInfo = { 0 };
 
 	ProcessInfo.pEprocess = pEprocess;
@@ -100,7 +100,7 @@ IOCTL_FUNC(CollectProcessInfo) {
 		return;
 	}
 
-	PVECTOR pProcessInfoVector = NewVector(sizeof(PPROCESS_INFO));
+	PKVECTOR pProcessInfoVector = NewVector(sizeof(PPROCESS_INFO));
 	if (!pProcessInfoVector) {
 		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
 		return;

@@ -20,7 +20,7 @@
     <ClInclude Include="Ioctl.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Vector.h">
+    <ClInclude Include="KVector.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Util.h">
@@ -67,7 +67,7 @@
     <ClCompile Include="Ioctl.c">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Vector.c">
+    <ClCompile Include="KVector.c">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Util.c">

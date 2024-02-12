@@ -1,6 +1,6 @@
 #include "Module.h"
 #include "Undocument.h"
-#include "Vector.h"
+#include "KVector.h"
 #include "OutputStruct.h"
 #include "Util.h"
 #include "Ioctl.h"
@@ -65,7 +65,7 @@ ENUM_STATUS CollectModuleInfoCallback(
 		return ENUM_ERROR;
 	}
 
-	PVECTOR pVector = (PVECTOR)Parameter;
+	PKVECTOR pVector = (PKVECTOR)Parameter;
 	MODULE_INFO Info = { 0 };
 
 	Info.pDllBase = pKldrDataTableEntry->DllBase;
@@ -116,7 +116,7 @@ IOCTL_FUNC(CollectModuleInfo) {
 		return;
 	}
 
-	PVECTOR pModuleInfoVector = NewVector(sizeof(PMODULE_INFO));
+	PKVECTOR pModuleInfoVector = NewVector(sizeof(PMODULE_INFO));
 	if (!pModuleInfoVector) {
 		SET_IRP_DATA_STATUS(pIrpData, 0, STATUS_UNSUCCESSFUL);
 		return;
