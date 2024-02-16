@@ -56,6 +56,9 @@
     <ClInclude Include="KString.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="KBuffer.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.c">
@@ -92,6 +95,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="KString.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="KBuffer.c">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

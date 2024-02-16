@@ -1,4 +1,5 @@
 #pragma once
+#include <ntifs.h>
 
 typedef ULONG ENUM_STATUS;
 #define ENUM_ERROR 2
@@ -7,3 +8,8 @@ typedef ULONG ENUM_STATUS;
 #define IS_CONTINUE_ENUM(status) ((ULONG)(status) == ENUM_CONTINUE)
 
 #define NTOSKRNL_NAME L"ntoskrnl.exe"
+
+typedef enum _ALLOC_TYPE {
+	OnStack = 0,
+	OnHeap
+}ALLOC_TYPE, * PALLOC_TYPE;

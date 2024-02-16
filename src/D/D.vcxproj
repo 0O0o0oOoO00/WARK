@@ -137,6 +137,7 @@
     <ClInclude Include="Dispatch.h" />
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Ioctl.h" />
+    <ClInclude Include="KBuffer.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="NtoskrnlOffset.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="Dispatch.c" />
     <ClCompile Include="Driver.c" />
     <ClCompile Include="Ioctl.c" />
+    <ClCompile Include="KBuffer.c" />
     <ClCompile Include="Main.c" />
     <ClCompile Include="Memory.c" />
     <ClCompile Include="Module.c" />
