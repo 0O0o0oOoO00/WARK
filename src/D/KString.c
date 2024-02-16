@@ -62,6 +62,9 @@ NTSTATUS InitStringWithRawUnicodeString(
 	UNICODE_STRING UString = { 0 };
 	RtlInitUnicodeString(&UString, pRawUString);
 
+	pString->UString.Buffer = MmAllocateZeroedNonPagedMemory(UString.MaximumLength);
+	pString->UString.MaximumLength = UString.MaximumLength;
+
 	RtlCopyUnicodeString(&(pString->UString), &UString);
 
 	pString->Type = UnicodeStringType;
@@ -94,6 +97,14 @@ NTSTATUS InitStringWithRawAnsiString(
 	if (!pString || !pRawAString) {
 		return STATUS_UNSUCCESSFUL;
 	}
+
+	ANSI_STRING AString = { 0 };
+	RtlInitAnsiString(&AString, pRawAString);
+
+	pString->AString.Buffer = MmAllocateZeroedNonPagedMemory(AString.MaximumLength);
+	pString->AString.MaximumLength = AString.MaximumLength;
+
+	RtlCopyString(&(pString->AString), &AString);
 
 	pString->Type = AnsiStringType;
 	return STATUS_SUCCESS;
