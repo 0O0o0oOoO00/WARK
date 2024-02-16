@@ -134,3 +134,7 @@ PUNICODE_STRING GetUStringFromString(
 PANSI_STRING GetAStringFromString(
 	_In_ PKSTRING pKString
 );
+
+VOID ClearString(
+	_In_ PKSTRING pKString
+);

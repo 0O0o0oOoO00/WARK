@@ -741,3 +741,28 @@ PANSI_STRING GetAStringFromString(
 
 	return pAString;
 }
+
+VOID ClearString(
+	_In_ PKSTRING pKString
+) {
+	if (!pKString) {
+		return;
+	}
+
+	switch (pKString->Type) {
+	case NoneContentType: {
+		break;
+	}
+	case UnicodeStringType: {
+		RtlFreeUnicodeString(&(pKString->UString));
+		break;
+	}
+	case AnsiStringType: {
+		RtlFreeAnsiString(&(pKString->AString));
+		break;
+	}
+	default:
+		break;
+	}
+	pKString->Type = NoneContentType;
+}
