@@ -2,7 +2,9 @@
 #include "Util.h"
 
 PKSTRING NewEmptyString() {
-	return MmAllocateZeroedNonPagedMemory(sizeof(KSTRING));
+	PKSTRING pKString = MmAllocateZeroedNonPagedMemory(sizeof(KSTRING));
+	pKString->AllocType = OnHeap;
+	return pKString;
 }
 
 NTSTATUS InitStringWithString(
@@ -194,6 +196,10 @@ VOID FreeString(
 	default:
 		return;
 		break;
+	}
+
+	if (pString->AllocType == OnHeap) {
+		ExFreePool(pString);
 	}
 }
 

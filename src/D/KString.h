@@ -1,5 +1,6 @@
 #pragma once
 #include <ntifs.h>
+#include "Define.h"
 
 typedef enum _STRING_TYPE {
 	NoneContentType = 0,
@@ -9,6 +10,7 @@ typedef enum _STRING_TYPE {
 
 typedef struct _KSTRING {
 	STRING_TYPE Type;
+	ALLOC_TYPE AllocType;
 	union {
 		UNICODE_STRING UString;
 		ANSI_STRING AString;
