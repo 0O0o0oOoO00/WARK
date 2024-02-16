@@ -230,12 +230,20 @@ NTSTATUS ExpandStringBufferLength(
 
 		RtlCopyMemory(pNewBuffer, pString->UString.Buffer, pString->UString.MaximumLength);
 		ExFreePool(pString->UString.Buffer);
+		
+		pString->UString.Buffer = pNewBuffer;
+		pString->UString.MaximumLength = usNewLength;
+		
 		break;
 	case AnsiStringType:
 		pNewBuffer = MmAllocateZeroedNonPagedMemory(usNewLength);
 
 		RtlCopyMemory(pNewBuffer, pString->AString.Buffer, pString->AString.MaximumLength);
 		ExFreePool(pString->AString.Buffer);
+
+		pString->AString.Buffer = pNewBuffer;
+		pString->AString.MaximumLength = usNewLength;
+
 		break;
 	default:
 		return STATUS_UNSUCCESSFUL;
