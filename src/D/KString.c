@@ -674,3 +674,70 @@ PKSTRING* SplitStringWithAnsi(
 
 	return pSplictedString;
 }
+
+PUNICODE_STRING GetUStringFromString(
+	_In_ PKSTRING pKString
+) {
+	if (!pKString) {
+		return NULL;
+	}
+
+	PUNICODE_STRING pUString = MmAllocateZeroedNonPagedMemory(sizeof(UNICODE_STRING));
+
+	switch (pKString->Type) {
+	case NoneContentType: {
+		break;
+	}
+	case UnicodeStringType: {
+		PWCHAR pURaw = MmAllocateZeroedNonPagedMemory(pKString->UString.MaximumLength);
+		RtlCopyMemory(pURaw, pKString->UString.Buffer, pKString->UString.MaximumLength);
+
+		pUString->Buffer = pURaw;
+		pUString->Length = pKString->UString.Length;
+		pUString->MaximumLength = pKString->UString.MaximumLength;
+		break;
+	}
+	case AnsiStringType: {
+		RtlAnsiStringToUnicodeString(pUString, &(pKString->AString), TRUE);
+		return pUString;
+		break;
+	}
+	default:
+		break;
+	}
+
+	return pUString;
+}
+
+PANSI_STRING GetAStringFromString(
+	_In_ PKSTRING pKString
+) {
+	if (!pKString) {
+		return NULL;
+	}
+
+	PANSI_STRING pAString = MmAllocateZeroedNonPagedMemory(sizeof(ANSI_STRING));
+
+	switch (pKString->Type) {
+	case NoneContentType: {
+		break;
+	}
+	case UnicodeStringType: {
+		RtlUnicodeStringToAnsiString(pAString, &(pKString->UString), TRUE);
+		break;
+	}
+	case AnsiStringType: {
+		PCHAR pARaw = MmAllocateZeroedNonPagedMemory(pKString->AString.MaximumLength);
+		RtlCopyMemory(pARaw, pKString->AString.Buffer, pKString->AString.MaximumLength);
+
+		pAString->Buffer = pARaw;
+		pAString->Length = pKString->AString.Length;
+		pAString->MaximumLength = pKString->AString.MaximumLength;
+		break;
+	}
+	default:
+		break;
+	}
+
+	return pAString;
+}

@@ -127,3 +127,10 @@ PKSTRING* SplitStringWithAnsi(
 	_In_ CHAR Separator,
 	_Out_ PULONG pCount
 );
+
+PUNICODE_STRING GetUStringFromString(
+	_In_ PKSTRING pKString
+);
+PANSI_STRING GetAStringFromString(
+	_In_ PKSTRING pKString
+);
