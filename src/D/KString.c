@@ -509,7 +509,7 @@ PWCHAR* SplitRawUnicodeString(
 	_In_ WCHAR Separator,
 	_Out_ PULONG pCount
 ) {
-	ULONG ulCount = 0;
+	ULONG ulCount = 1;
 	USHORT usLength = RawUnicodeStringLength(pString);
 	USHORT usStringLength = usLength / sizeof(WCHAR);
 
@@ -565,7 +565,7 @@ PCHAR* SplitRawAnsiString(
 	_In_ CHAR Separator,
 	_Out_ PULONG pCount
 ) {
-	ULONG ulCount = 0;
+	ULONG ulCount = 1;
 	USHORT usLength = RawAnsiStringLength(pString);
 	USHORT usStringLength = usLength / sizeof(CHAR);
 
