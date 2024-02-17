@@ -522,8 +522,8 @@ PWCHAR* SplitRawUnicodeString(
 	PWCHAR pStart = pString;
 	PWCHAR* pSplited = MmAllocateZeroedNonPagedMemory(sizeof(PWCHAR) * ulCount);
 	USHORT usSplitedLength = 0;
-	for (ULONG i = 0, j = 0; i < usStringLength; i++) {
-		if (pString[i] == Separator) {
+	for (ULONG i = 0, j = 0; i <= usStringLength; i++) {
+		if (pString[i] == Separator || pString[i] == L'\0') {
 			USHORT usPartLength = i * sizeof(WCHAR) - usSplitedLength;
 			PWCHAR pPart = MmAllocateZeroedNonPagedMemory(usPartLength + sizeof(WCHAR));
 			RtlCopyMemory(pPart, pStart, usPartLength);
@@ -580,8 +580,8 @@ PCHAR* SplitRawAnsiString(
 	PCHAR pStart = pString;
 	PCHAR* pSplited = MmAllocateZeroedNonPagedMemory(sizeof(PCHAR) * ulCount);
 	USHORT usSplitedLength = 0;
-	for (ULONG i = 0, j = 0; i < usStringLength; i++) {
-		if (pString[i] == Separator) {
+	for (ULONG i = 0, j = 0; i <= usStringLength; i++) {
+		if (pString[i] == Separator || pString[i] == '\0') {
 			USHORT usPartLength = i * sizeof(WCHAR) - usSplitedLength;
 			PCHAR pPart = MmAllocateZeroedNonPagedMemory(usPartLength + sizeof(CHAR));
 			RtlCopyMemory(pPart, pStart, usPartLength);
