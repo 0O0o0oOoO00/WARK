@@ -264,7 +264,7 @@ USHORT RawAnsiStringLength(
 		usLength++;
 	}
 	
-	return usLength;
+	return usLength * sizeof(CHAR);
 }
 
 USHORT RawUnicodeStringLength(
@@ -279,7 +279,7 @@ USHORT RawUnicodeStringLength(
 		usLength++;
 	}
 
-	return usLength;
+	return usLength * sizeof(WCHAR);
 }
 
 NTSTATUS AppendUnicodeString(
