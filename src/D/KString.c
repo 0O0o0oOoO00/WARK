@@ -39,6 +39,9 @@ NTSTATUS InitStringWithUnicodeString(
 	if (!pString || !pUString) {
 		return STATUS_UNSUCCESSFUL;
 	}
+	if (!pUString->Buffer) {
+		goto Return;
+	}
 
 	USHORT usBufferSize = pUString->MaximumLength;
 	PVOID pBuffer = MmAllocateZeroedNonPagedMemory(usBufferSize);
@@ -46,8 +49,8 @@ NTSTATUS InitStringWithUnicodeString(
 
 	RtlCopyUnicodeString(&(pString->UString), pUString);
 
+Return:
 	pString->Type = UnicodeStringType;
-
 	return STATUS_SUCCESS;
 }
 
@@ -78,6 +81,9 @@ NTSTATUS InitStringWithAnsiString(
 	if (!pString || !pAString) {
 		return STATUS_UNSUCCESSFUL;
 	}
+	if (!pAString->Buffer) {
+		goto Return;
+	}
 
 	USHORT usBufferSize = pAString->MaximumLength;
 	PVOID pBuffer = MmAllocateZeroedNonPagedMemory(usBufferSize);
@@ -85,8 +91,8 @@ NTSTATUS InitStringWithAnsiString(
 
 	RtlCopyString(&(pString->AString), pAString);
 
+Return:
 	pString->Type = AnsiStringType;
-
 	return STATUS_SUCCESS;
 }
 
@@ -193,10 +199,6 @@ VOID FreeString(
 		return;
 	}
 
-	PVOID pBuffer = NULL;
-	PUSHORT pLength = NULL;
-	PUSHORT pMaximumLength = NULL;
-
 	switch (pString->Type) {
 	case UnicodeStringType:
 		RtlFreeUnicodeString(&(pString->UString));
@@ -204,8 +206,8 @@ VOID FreeString(
 	case AnsiStringType:
 		RtlFreeAnsiString(&(pString->AString));
 		break;
+	case NoneContentType:
 	default:
-		return;
 		break;
 	}
 
@@ -225,17 +227,18 @@ NTSTATUS ExpandStringBufferLength(
 	PVOID pNewBuffer = NULL;
 
 	switch (pString->Type) {
-	case UnicodeStringType:
+	case UnicodeStringType: {
 		pNewBuffer = MmAllocateZeroedNonPagedMemory(usNewLength);
 
 		RtlCopyMemory(pNewBuffer, pString->UString.Buffer, pString->UString.MaximumLength);
 		ExFreePool(pString->UString.Buffer);
-		
+
 		pString->UString.Buffer = pNewBuffer;
 		pString->UString.MaximumLength = usNewLength;
-		
+
 		break;
-	case AnsiStringType:
+	}
+	case AnsiStringType: {
 		pNewBuffer = MmAllocateZeroedNonPagedMemory(usNewLength);
 
 		RtlCopyMemory(pNewBuffer, pString->AString.Buffer, pString->AString.MaximumLength);
@@ -245,6 +248,8 @@ NTSTATUS ExpandStringBufferLength(
 		pString->AString.MaximumLength = usNewLength;
 
 		break;
+	}
+	case NoneContentType:
 	default:
 		return STATUS_UNSUCCESSFUL;
 		break;
@@ -329,27 +334,45 @@ NTSTATUS AppendAnsiString(
 		return STATUS_UNSUCCESSFUL;
 	}
 
+	NTSTATUS FuncStatus;
+
 	switch (pBase->Type) {
 	case NoneContentType: {
-		InitStringWithAnsiString(pBase, pAString);
+		return InitStringWithAnsiString(pBase, pAString);
 		break;
 	}
 	case UnicodeStringType: {
-		ExpandStringBufferLength(pBase, pBase->UString.MaximumLength + pAString->MaximumLength);
+		FuncStatus = ExpandStringBufferLength(pBase, pBase->UString.MaximumLength + pAString->MaximumLength);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
 
 		UNICODE_STRING szUString = { 0 };
-		RtlAnsiStringToUnicodeString(&szUString, pAString, TRUE);
+		FuncStatus = RtlAnsiStringToUnicodeString(&szUString, pAString, TRUE);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
 
-		RtlAppendStringToString(&(pBase->UString), &szUString);
+		FuncStatus = RtlAppendStringToString(&(pBase->UString), &szUString);
+		if (!NT_SUCCESS(FuncStatus)) {
+			RtlFreeUnicodeString(&szUString);
+			goto Error;
+		}
 
-		RtlFreeAnsiString(&szUString);
+		RtlFreeUnicodeString(&szUString);
 
 		break;
 	}
 	case AnsiStringType: {
-		ExpandStringBufferLength(pBase, pBase->AString.MaximumLength + pAString->MaximumLength);
+		FuncStatus = ExpandStringBufferLength(pBase, pBase->AString.MaximumLength + pAString->MaximumLength);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
 
-		RtlAppendStringToString(&(pBase->AString), pAString);
+		FuncStatus = RtlAppendStringToString(&(pBase->AString), pAString);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
 
 		break;
 	}
@@ -358,6 +381,8 @@ NTSTATUS AppendAnsiString(
 		break;
 	}
 	return STATUS_SUCCESS;
+Error:
+	return STATUS_UNSUCCESSFUL;
 }
 
 NTSTATUS AppendRawAnsiString(
@@ -368,30 +393,49 @@ NTSTATUS AppendRawAnsiString(
 		return STATUS_UNSUCCESSFUL;
 	}
 
+	NTSTATUS FuncStatus;
+
 	ANSI_STRING szAString = { 0 };
 	RtlInitAnsiString(&szAString, pRawAString);
 
 	switch (pBase->Type) {
 	case NoneContentType: {
-		InitStringWithRawAnsiString(pBase, pRawAString);
+		return InitStringWithRawAnsiString(pBase, pRawAString);
 		break;
 	}
 	case UnicodeStringType: {
 		UNICODE_STRING szUString = { 0 };
-		RtlAnsiStringToUnicodeString(&szUString, &szAString, TRUE);
+		FuncStatus = RtlAnsiStringToUnicodeString(&szUString, &szAString, TRUE);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
+		
+		FuncStatus = ExpandStringBufferLength(pBase, pBase->UString.MaximumLength + szUString.MaximumLength);
+		if (!NT_SUCCESS(FuncStatus)) {
+			RtlFreeUnicodeString(&szUString);
+			goto Error;
+		}
 
-		ExpandStringBufferLength(pBase, pBase->UString.MaximumLength + szUString.MaximumLength);
+		FuncStatus = RtlAppendStringToString(&(pBase->UString), &szUString);
+		if (!NT_SUCCESS(FuncStatus)) {
+			RtlFreeUnicodeString(&szUString);
+			goto Error;
+		}
 
-		RtlAppendStringToString(&(pBase->UString), &szUString);
-
-		RtlFreeAnsiString(&szUString);
+		RtlFreeUnicodeString(&szUString);
 
 		break;
 	}
 	case AnsiStringType: {
-		ExpandStringBufferLength(pBase, pBase->AString.MaximumLength + szAString.MaximumLength);
+		FuncStatus = ExpandStringBufferLength(pBase, pBase->AString.MaximumLength + szAString.MaximumLength);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
 
-		RtlAppendStringToString(&(pBase->AString), &szAString);
+		FuncStatus = RtlAppendStringToString(&(pBase->AString), &szAString);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
 
 		break;
 	}
@@ -400,6 +444,8 @@ NTSTATUS AppendRawAnsiString(
 		break;
 	}
 	return STATUS_SUCCESS;
+Error:
+	return STATUS_UNSUCCESSFUL;
 }
 
 NTSTATUS AppendRawUnicodeString(
@@ -410,28 +456,47 @@ NTSTATUS AppendRawUnicodeString(
 		return STATUS_UNSUCCESSFUL;
 	}
 
+	NTSTATUS FuncStatus;
+
 	UNICODE_STRING szUString = { 0 };
 	RtlInitUnicodeString(&szUString, pRawUString);
 
 	switch (pBase->Type) {
 	case NoneContentType: {
-		InitStringWithRawUnicodeString(pBase, pRawUString);
+		return InitStringWithRawUnicodeString(pBase, pRawUString);
 		break;
 	}
 	case UnicodeStringType: {
-		ExpandStringBufferLength(pBase, pBase->UString.MaximumLength + szUString.MaximumLength);
+		FuncStatus = ExpandStringBufferLength(pBase, pBase->UString.MaximumLength + szUString.MaximumLength);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
 
-		RtlAppendStringToString(&(pBase->UString), &szUString);
+		FuncStatus = RtlAppendStringToString(&(pBase->UString), &szUString);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
 
 		break;
 	}
 	case AnsiStringType: {
 		ANSI_STRING szAString = { 0 };
-		RtlUnicodeStringToAnsiString(&szAString, &szUString, TRUE);
+		FuncStatus = RtlUnicodeStringToAnsiString(&szAString, &szUString, TRUE);
+		if (!NT_SUCCESS(FuncStatus)) {
+			goto Error;
+		}
+		
+		FuncStatus = ExpandStringBufferLength(pBase, pBase->AString.MaximumLength + szAString.MaximumLength);
+		if (!NT_SUCCESS(FuncStatus)) {
+			RtlFreeAnsiString(&szAString);
+			goto Error;
+		}
 
-		ExpandStringBufferLength(pBase, pBase->AString.MaximumLength + szAString.MaximumLength);
-
-		RtlAppendStringToString(&(pBase->AString), &szAString);
+		FuncStatus = RtlAppendStringToString(&(pBase->AString), &szAString);
+		if (!NT_SUCCESS(FuncStatus)) {
+			RtlFreeAnsiString(&szAString);
+			goto Error;
+		}
 
 		RtlFreeAnsiString(&szAString);
 		break;
@@ -441,6 +506,8 @@ NTSTATUS AppendRawUnicodeString(
 		break;
 	}
 	return STATUS_SUCCESS;
+Error:
+	return STATUS_UNSUCCESSFUL;
 }
 
 NTSTATUS AppendString(
@@ -509,8 +576,18 @@ PWCHAR* SplitRawUnicodeString(
 	_In_ WCHAR Separator,
 	_Out_ PULONG pCount
 ) {
+	if (!pCount) {
+		return NULL;
+	}
+	if (!pString) {
+		goto Error;
+	}
+
 	ULONG ulCount = 1;
 	USHORT usLength = RawUnicodeStringLength(pString);
+	if (!usLength) {
+		goto Error;
+	}
 	USHORT usStringLength = usLength / sizeof(WCHAR);
 
 	for (ULONG i = 0; i < usStringLength; i++) {
@@ -521,6 +598,9 @@ PWCHAR* SplitRawUnicodeString(
 
 	PWCHAR pStart = pString;
 	PWCHAR* pSplited = MmAllocateZeroedNonPagedMemory(sizeof(PWCHAR) * ulCount);
+	if (!pSplited) {
+		return NULL;
+	}
 	USHORT usSplitedLength = 0;
 	for (ULONG i = 0, j = 0; i <= usStringLength; i++) {
 		if (pString[i] == Separator || pString[i] == L'\0') {
@@ -533,8 +613,10 @@ PWCHAR* SplitRawUnicodeString(
 		}
 	}
 	*pCount = ulCount;
-
 	return pSplited;
+Error:
+	*pCount = 0;
+	return NULL;
 }
 
 PUNICODE_STRING* SplitUnicodeString(
@@ -542,14 +624,23 @@ PUNICODE_STRING* SplitUnicodeString(
 	_In_ WCHAR Separator,
 	_Out_ PULONG pCount
 ) {
-	if (!pString || !pCount) {
+	if (!pCount) {
 		return NULL;
+	}
+	if (!pString) {
+		goto Error;
 	}
 
 	ULONG ulCount = 0;
 	PWCHAR* pSplitedRaw = SplitRawUnicodeString(pString->Buffer, Separator, &ulCount);
-
+	if (!pSplitedRaw) {
+		goto Error;
+	}
 	PUNICODE_STRING* pSplited = MmAllocateZeroedNonPagedMemory(sizeof(PUNICODE_STRING) * ulCount);
+	if (!pSplited) {
+		ExFreePool(pSplitedRaw);
+		goto Error;
+	}
 	for (ULONG i = 0; i < ulCount; i++) {
 		PUNICODE_STRING pPart = MmAllocateZeroedNonPagedMemory(sizeof(UNICODE_STRING));
 		RtlInitUnicodeString(pPart, pSplitedRaw[i]);
@@ -560,6 +651,9 @@ PUNICODE_STRING* SplitUnicodeString(
 
 	*pCount = ulCount;
 	return pSplited;
+Error:
+	*pCount = 0;
+	return NULL;
 }
 
 PCHAR* SplitRawAnsiString(
@@ -567,8 +661,18 @@ PCHAR* SplitRawAnsiString(
 	_In_ CHAR Separator,
 	_Out_ PULONG pCount
 ) {
+	if (!pCount) {
+		return NULL;
+	}
+	if (!pString) {
+		goto Error;
+	}
+
 	ULONG ulCount = 1;
 	USHORT usLength = RawAnsiStringLength(pString);
+	if (!usLength) {
+		goto Error;
+	}
 	USHORT usStringLength = usLength / sizeof(CHAR);
 
 	for (ULONG i = 0; i < usStringLength; i++) {
@@ -579,6 +683,9 @@ PCHAR* SplitRawAnsiString(
 
 	PCHAR pStart = pString;
 	PCHAR* pSplited = MmAllocateZeroedNonPagedMemory(sizeof(PCHAR) * ulCount);
+	if (!pSplited) {
+		goto Error;
+	}
 	USHORT usSplitedLength = 0;
 	for (ULONG i = 0, j = 0; i <= usStringLength; i++) {
 		if (pString[i] == Separator || pString[i] == '\0') {
@@ -591,8 +698,10 @@ PCHAR* SplitRawAnsiString(
 		}
 	}
 	*pCount = ulCount;
-
 	return pSplited;
+Error:
+	*pCount = 0;
+	return NULL;
 }
 
 PANSI_STRING* SplitAnsiString(
@@ -600,14 +709,24 @@ PANSI_STRING* SplitAnsiString(
 	_In_ CHAR Separator,
 	_Out_ PULONG pCount
 ) {
-	if (!pString || !pCount) {
+	if (!pCount) {
 		return NULL;
+	}
+	if (!pString) {
+		goto Error;
 	}
 
 	ULONG ulCount = 0;
 	PCHAR* pSplitedRaw = SplitRawAnsiString(pString->Buffer, Separator, &ulCount);
+	if (!pSplitedRaw) {
+		goto Error;
+	}
 
 	PANSI_STRING* pSplited = MmAllocateZeroedNonPagedMemory(sizeof(PANSI_STRING) * ulCount);
+	if (!pSplited) {
+		ExFreePool(pSplitedRaw);
+		goto Error;
+	}
 	for (ULONG i = 0; i < ulCount; i++) {
 		PANSI_STRING pPart = MmAllocateZeroedNonPagedMemory(sizeof(ANSI_STRING));
 		RtlInitAnsiString(pPart, pSplitedRaw[i]);
@@ -618,6 +737,9 @@ PANSI_STRING* SplitAnsiString(
 
 	*pCount = ulCount;
 	return pSplited;
+Error:
+	*pCount = 0;
+	return NULL;
 }
 
 PKSTRING* SplitStringWithUnicode(
@@ -625,8 +747,11 @@ PKSTRING* SplitStringWithUnicode(
 	_In_ WCHAR Separator,
 	_Out_ PULONG pCount
 ) {
-	if (!pString || !pCount) {
+	if (!pCount) {
 		return NULL;
+	}
+	if (!pString) {
+		goto Error;
 	}
 
 	ULONG ulCount = 0;
@@ -635,7 +760,16 @@ PKSTRING* SplitStringWithUnicode(
 	switch (pString->Type) {
 	case UnicodeStringType: {
 		PUNICODE_STRING* pSplited = SplitUnicodeString(&(pString->UString), Separator, &ulCount);
+		if (!pSplited) {
+			goto Error;
+		}
+		
 		pSplictedString = MmAllocateZeroedNonPagedMemory(sizeof(PKSTRING) * ulCount);
+		if (!pSplictedString) {
+			ExFreePool(pSplited);
+			goto Error;
+		}
+
 		for (ULONG i = 0; i < ulCount; i++) {
 			pSplictedString[i] = NewStringWithUnicodeString(pSplited[i]);
 		}
@@ -644,7 +778,15 @@ PKSTRING* SplitStringWithUnicode(
 	}
 	case AnsiStringType: {
 		PANSI_STRING* pSplited = SplitAnsiString(&(pString->AString), U2A(Separator), &ulCount);
+		if (!pSplited) {
+			goto Error;
+		}
+		
 		pSplictedString = MmAllocateZeroedNonPagedMemory(sizeof(PKSTRING) * ulCount);
+		if (!pSplictedString) {
+			ExFreePool(pSplited);
+			goto Error;
+		}
 		for (ULONG i = 0; i < ulCount; i++) {
 			pSplictedString[i] = NewStringWithAnsiString(pSplited[i]);
 		}
@@ -655,8 +797,11 @@ PKSTRING* SplitStringWithUnicode(
 		return NULL;
 		break;
 	}
-
+	*pCount = ulCount;
 	return pSplictedString;
+Error:
+	*pCount = 0;
+	return NULL;
 }
 
 PKSTRING* SplitStringWithAnsi(
@@ -664,8 +809,11 @@ PKSTRING* SplitStringWithAnsi(
 	_In_ CHAR Separator,
 	_Out_ PULONG pCount
 ) {
-	if (!pString || !pCount) {
+	if (!pCount) {
 		return NULL;
+	}
+	if (!pString) {
+		goto Error;
 	}
 
 	ULONG ulCount = 0;
@@ -674,7 +822,15 @@ PKSTRING* SplitStringWithAnsi(
 	switch (pString->Type) {
 	case UnicodeStringType: {
 		PUNICODE_STRING* pSplited = SplitUnicodeString(&(pString->UString), A2U(Separator), &ulCount);
+		if (!pSplited) {
+			goto Error;
+		}
+
 		pSplictedString = MmAllocateZeroedNonPagedMemory(sizeof(PKSTRING) * ulCount);
+		if (!pSplictedString) {
+			ExFreePool(pSplited);
+			goto Error;
+		}
 		for (ULONG i = 0; i < ulCount; i++) {
 			pSplictedString[i] = NewStringWithUnicodeString(pSplited[i]);
 		}
@@ -683,7 +839,14 @@ PKSTRING* SplitStringWithAnsi(
 	}
 	case AnsiStringType: {
 		PANSI_STRING* pSplited = SplitAnsiString(&(pString->AString), Separator, &ulCount);
+		if (!pSplited) {
+			goto Error;
+		}
 		pSplictedString = MmAllocateZeroedNonPagedMemory(sizeof(PKSTRING) * ulCount);
+		if (!pSplictedString) {
+			ExFreePool(pSplited);
+			goto Error;
+		}
 		for (ULONG i = 0; i < ulCount; i++) {
 			pSplictedString[i] = NewStringWithAnsiString(pSplited[i]);
 		}
@@ -694,18 +857,26 @@ PKSTRING* SplitStringWithAnsi(
 		return NULL;
 		break;
 	}
-
+	*pCount = ulCount;
 	return pSplictedString;
+Error:
+	*pCount = 0;
+	return NULL;
 }
 
 PUNICODE_STRING GetUStringFromString(
 	_In_ PKSTRING pKString
 ) {
 	if (!pKString) {
-		return NULL;
+		goto Error;
 	}
 
+	NTSTATUS FuncStatus;
+
 	PUNICODE_STRING pUString = MmAllocateZeroedNonPagedMemory(sizeof(UNICODE_STRING));
+	if (!pUString) {
+		goto Error;
+	}
 
 	switch (pKString->Type) {
 	case NoneContentType: {
@@ -713,6 +884,11 @@ PUNICODE_STRING GetUStringFromString(
 	}
 	case UnicodeStringType: {
 		PWCHAR pURaw = MmAllocateZeroedNonPagedMemory(pKString->UString.MaximumLength);
+		if (!pURaw) {
+			ExFreePool(pUString);
+			goto Error;
+		}
+
 		RtlCopyMemory(pURaw, pKString->UString.Buffer, pKString->UString.MaximumLength);
 
 		pUString->Buffer = pURaw;
@@ -721,7 +897,11 @@ PUNICODE_STRING GetUStringFromString(
 		break;
 	}
 	case AnsiStringType: {
-		RtlAnsiStringToUnicodeString(pUString, &(pKString->AString), TRUE);
+		FuncStatus = RtlAnsiStringToUnicodeString(pUString, &(pKString->AString), TRUE);
+		if (!NT_SUCCESS(FuncStatus)) {
+			ExFreePool(pUString);
+			goto Error;
+		}
 		return pUString;
 		break;
 	}
@@ -730,27 +910,43 @@ PUNICODE_STRING GetUStringFromString(
 	}
 
 	return pUString;
+Error:
+	return NULL;
 }
 
 PANSI_STRING GetAStringFromString(
 	_In_ PKSTRING pKString
 ) {
 	if (!pKString) {
-		return NULL;
+		goto Error;
 	}
 
+	NTSTATUS FuncStatus;
+
 	PANSI_STRING pAString = MmAllocateZeroedNonPagedMemory(sizeof(ANSI_STRING));
+	if (!pAString) {
+		goto Error;
+	}
 
 	switch (pKString->Type) {
 	case NoneContentType: {
 		break;
 	}
 	case UnicodeStringType: {
-		RtlUnicodeStringToAnsiString(pAString, &(pKString->UString), TRUE);
+		FuncStatus = RtlUnicodeStringToAnsiString(pAString, &(pKString->UString), TRUE);
+		if (!NT_SUCCESS(FuncStatus)) {
+			ExFreePool(pAString);
+			goto Error;
+		}
+
 		break;
 	}
 	case AnsiStringType: {
 		PCHAR pARaw = MmAllocateZeroedNonPagedMemory(pKString->AString.MaximumLength);
+		if (!pARaw) {
+			ExFreePool(pAString);
+			goto Error;
+		}
 		RtlCopyMemory(pARaw, pKString->AString.Buffer, pKString->AString.MaximumLength);
 
 		pAString->Buffer = pARaw;
@@ -763,6 +959,8 @@ PANSI_STRING GetAStringFromString(
 	}
 
 	return pAString;
+Error:
+	return NULL;
 }
 
 VOID ClearString(
