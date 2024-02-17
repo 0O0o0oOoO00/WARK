@@ -532,6 +532,8 @@ PWCHAR* SplitRawUnicodeString(
 			usSplitedLength = i * sizeof(WCHAR);
 		}
 	}
+	*pCount = ulCount;
+
 	return pSplited;
 }
 
@@ -588,6 +590,8 @@ PCHAR* SplitRawAnsiString(
 			usSplitedLength = i * sizeof(CHAR);
 		}
 	}
+	*pCount = ulCount;
+
 	return pSplited;
 }
 
